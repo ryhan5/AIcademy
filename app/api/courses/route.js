@@ -6,9 +6,17 @@ import { NextResponse } from "next/server";
 export async function POST(req){
     const {createdBy}=await req.json();
 
-    const result=await db.select().from(STUDY_MATERIAL_TABLE)
-    .where(eq(STUDY_MATERIAL_TABLE.createdBy,createdBy))
-    .orderBy(desc(STUDY_MATERIAL_TABLE.id))
+    // Build the base query
+    let query = db.select().from(STUDY_MATERIAL_TABLE)
+        .orderBy(desc(STUDY_MATERIAL_TABLE.id));
+
+    // Conditionally add the where clause if createdBy is provided
+    if (createdBy) {
+        query = query.where(eq(STUDY_MATERIAL_TABLE.createdBy, createdBy));
+    }
+
+    // Execute the query
+    const result = await query;
 
 
 

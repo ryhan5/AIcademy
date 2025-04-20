@@ -1,11 +1,11 @@
 import React from 'react'
-import DashboardHeader from '../dashboard/_components/DashboardHeader'
+import Header from '../dashboard/Header'
 
 function CourseViewLayout({children}) {
   return (
-    <div>
-        <DashboardHeader/>
-        <div className='mx-10 md:mx-36 lg:px-60 mt-10'>
+    <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className='pt-24 mx-10 md:mx-36 lg:px-60'>
             {children}
         </div>
     </div>

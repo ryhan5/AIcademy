@@ -19,15 +19,9 @@ function Sidebar() {
       path:'/dashboard'
     },
     {
-      name:'Upgrade',
-      icon:Shield,
-      path:'/dashboard/upgrade',
-
-    },
-    {
-      name:'Profile',
+      name:'Career Insights',
       icon:UserCircle,
-      path:'/dashboard/profile'
+      path:'/insights'
     }
   ]
 
@@ -40,10 +34,10 @@ function Sidebar() {
 
         <div className='flex gap-2 item-center'>
         
-        <a href="/dashboard"> <img src="./image6.webp" alt="" className='w-10 h-10 object-cover rounded-full' /></a>
+        <a href="/dashboard"> <img src="./logo.jpeg" alt="" className='w-10 h-10 object-cover rounded-full' /></a>
        
             
-            <h2 className='font-bold text-2xl '>Easy study</h2>
+            <h2 className='font-bold text-2xl '>AIcademy</h2>
 
         </div>
 

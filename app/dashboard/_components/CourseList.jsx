@@ -1,6 +1,5 @@
 "use client"
 
-import { useUser } from '@clerk/nextjs'
 import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import CourseCardItem from './CourseCardItem';
@@ -11,7 +10,7 @@ import { CourseCountContext } from '@/app/_context/CourseCountContext';
 function CourseList() {
 
 
-    const {user}=useUser();
+    // const {user}=useUser(); // Removed user hook
 
     const [CourseList,setCourseList]=useState([])
 
@@ -20,22 +19,31 @@ function CourseList() {
     const {totalCourse,setTotalCourse}=useContext(CourseCountContext)
 
 
-    useEffect(()=>{
-        user&&GetCourseList();
-    },[user])
+    useEffect(() => {
+        // Fetch on mount
+        GetCourseList();
+        // Poll every 5 seconds
+        const interval = setInterval(() => {
+            GetCourseList();
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []); // Empty dependency array means run once on mount
 
     const GetCourseList=async()=>{
 
         setLoading(true)
 
-        const result=await axios.post('/api/courses',{createdBy:user?.primaryEmailAddress?.emailAddress})
-
-        
-        console.log(result)
-        setCourseList(result.data.result);
-
+        // Fetch all courses, removed createdBy filter
+        try {
+            const result = await axios.post('/api/courses', {});
+            console.log(result);
+            setCourseList(result.data.result);
+            setTotalCourse(result.data.result?.length)
+        } catch (error) {
+            console.error('Error fetching course list:', error);
+            // Optionally show a toast or alert here
+        }
         setLoading(false)
-        setTotalCourse(result.data.result?.length)
     }
 
 

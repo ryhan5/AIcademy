@@ -33,7 +33,7 @@ function Course() {
 
   return (
     <div>
-       {/* <DashboardHeader/>  */}
+       <DashboardHeader/> 
 
        <div>
          {/* course intro */}

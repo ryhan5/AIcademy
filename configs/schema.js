@@ -33,13 +33,13 @@ export const CHAPTER_NOTES_TABLE=pgTable('chapterNotes',{
     notes:text()
 });
 
-export const STUDY_TYPE_CONTENT_TABLE = pgTable('study_type_content', {
-    id: serial('id').primaryKey(),
-    courseId: varchar('course_id'),
-    type: varchar('type'),
-    content: json('content'),
-    status: varchar('status').default('NULL'),
-    createdAt: timestamp('created_at').defaultNow()
+export const STUDY_TYPE_CONTENT_TABLE = pgTable('studyTypeContent', {
+    id: serial().primaryKey(),
+    courseId: varchar().notNull(),
+    type: varchar().notNull(),
+    content: json(),
+    status: varchar().default('Generating'),
+    
 });
 
 
@@ -48,3 +48,15 @@ export const PAYMENT_RECORD_TABLE=pgTable('paymentRecord',{
     customerId:varchar(),
     sessionId:varchar(),
 })
+
+// User skills table definition
+export const USER_SKILLS_TABLE = pgTable('userSkills', {
+    id: serial('id').primaryKey(),
+    userId: varchar('userId').notNull(),
+    skill: varchar('skill').notNull(),
+    proficiency: integer('proficiency').default(1), // 1-5 scale
+    yearsExperience: integer('yearsExperience').default(0),
+    isVerified: boolean('isVerified').default(false),
+    dateAdded: timestamp('dateAdded').defaultNow(),
+    lastUpdated: timestamp('lastUpdated').defaultNow()
+});

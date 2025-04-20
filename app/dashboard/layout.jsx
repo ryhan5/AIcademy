@@ -1,33 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SignIn } from '@clerk/nextjs';
 import Sidebar from './_components/Sidebar';
-import DashboardHeader from './_components/DashboardHeader';
+import Header from './Header';
 import { CourseCountContext } from '../_context/CourseCountContext';
 
 function DashboardLayout({ children }) {
   const [totalCourse, setTotalCourse] = useState(0);
-  const [isSignInOpen, setSignInOpen] = useState(false);
 
   return (
     <CourseCountContext.Provider value={{ totalCourse, setTotalCourse }}>
       <div>
-        <div className='md:w-64 hidden md:block fixed'>
+        <Header />
+        <div className='md:w-64 hidden md:block fixed top-20'>
           <Sidebar />
         </div>
-        <div className='md:ml-64'>
-          <DashboardHeader />
-            <div className={`p-10 ${isSignInOpen ? 'blur' : ''}`}>
+        <div className='md:ml-64 pt-24'>
+          <div className='p-5'>
             {children}
-            <button onClick={() => setSignInOpen(true)} className="mt-4">
-              Sign In
-            </button>
-            <SignIn
-              open={isSignInOpen}
-              onClose={() => setSignInOpen(false)}
-              fallbackRedirectUrl="/dashboard"
-            />
           </div>
         </div>
       </div>
