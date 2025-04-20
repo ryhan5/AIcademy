@@ -16,7 +16,7 @@ const Header = () => {
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Jobs', path: '/jobs' },
     { label: 'Career Insights', path: '/insights' },
-    { label: 'Courses', path: '/course' }
+    { label: 'Interview', path: 'https://ai-interview-4jqn.vercel.app/interview' }
   ];
 
   // Handle scroll effect
