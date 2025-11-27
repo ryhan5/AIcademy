@@ -46,11 +46,8 @@ export default function Header() {
 
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center text-white font-bold text-lg shadow-[0_0_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform">
-                            S
-                        </div>
-                        <span className="font-bold text-xl text-white tracking-tight group-hover:text-white/90 transition-colors">
-                            SkillSync
+                        <span className="font-black text-2xl text-white tracking-tighter group-hover:text-[var(--primary)] transition-colors duration-300">
+                            AIcademy.
                         </span>
                     </Link>
 

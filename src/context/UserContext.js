@@ -49,7 +49,7 @@ export function UserProvider({ children }) {
 
         // Always save to local for redundancy/guest
         if (typeof window !== 'undefined') {
-            localStorage.setItem('skillsync_user_progress', JSON.stringify(newProgress));
+            localStorage.setItem('aicademy_user_progress', JSON.stringify(newProgress));
         }
 
         // If logged in, also save to DB

@@ -14,7 +14,11 @@ export default function Home() {
             title: 'Precision Guidance',
             description: 'Transform career goals into weekly AI-assisted sprints with milestones that adapt to your progress.',
             link: '/roadmap',
-            icon: '🧭',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+            ),
             size: 'large', // spans 2 cols
             gradient: 'from-violet-600/20 via-transparent to-teal-400/10',
             points: ['Adaptive pacing & focus blocks', 'Weekly retrospective summaries', 'Goal tracking with outcome metrics']
@@ -23,7 +27,11 @@ export default function Home() {
             title: 'Build, Don\'t Cram',
             description: 'Project-based learning with instant AI feedback on your code.',
             link: '/course',
-            icon: '⚡',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            ),
             size: 'normal',
             gradient: 'from-blue-500/20 via-transparent to-purple-500/10'
         },
@@ -31,7 +39,11 @@ export default function Home() {
             title: 'Motivation Engine',
             description: 'Gamified streaks, XP bursts, and community challenges to keep you shipping.',
             link: '/dashboard',
-            icon: '🏆',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            ),
             size: 'normal',
             gradient: 'from-emerald-500/20 via-transparent to-blue-500/10'
         },
@@ -39,7 +51,11 @@ export default function Home() {
             title: 'Skill Assessment',
             description: 'Verify your skills with adaptive quizzes that pinpoint your gaps.',
             link: '/quiz',
-            icon: '📝',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            ),
             size: 'wide', // spans 2 cols
             gradient: 'from-orange-500/20 via-transparent to-red-500/10',
             points: ['Real-time code evaluation', 'Personalized study recommendations']
@@ -54,7 +70,7 @@ export default function Home() {
 
     const testimonials = [
         {
-            quote: 'SkillSync turned my scattered Google Docs into a job-ready workflow in six weeks flat.',
+            quote: 'AIcademy turned my scattered Google Docs into a job-ready workflow in six weeks flat.',
             name: 'Priya N.',
             role: 'Frontend Developer @ Globex'
         },
@@ -72,22 +88,38 @@ export default function Home() {
 
     const journeySteps = [
         {
-            icon: '🎯',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+            ),
             title: 'Set your north star',
-            description: 'Tell SkillSync where you want to go and when. We blueprint a realistic path that flexes with life.'
+            description: 'Tell AIcademy where you want to go and when. We blueprint a realistic path that flexes with life.'
         },
         {
-            icon: '⚙️',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+            ),
             title: 'Sprint with clarity',
             description: 'Consume micro-lessons, build portfolio-worthy projects, and let AI tutors unblock you.'
         },
         {
-            icon: '📈',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+            ),
             title: 'Track momentum',
             description: 'Stay in flow with streaks, weekly retros, and adaptive adjustments based on your velocity.'
         },
         {
-            icon: '🚀',
+            icon: (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+            ),
             title: 'Showcase & level up',
             description: 'Publish your verified progress hub and unlock curated job matches tailored to your new skills.'
         }
@@ -119,11 +151,11 @@ export default function Home() {
                 <div className={`transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-white/10 mb-8 hover:border-white/20 transition-colors cursor-default shadow-[0_0_20px_rgba(124,58,237,0.1)]">
                         <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse"></span>
-                        <span className="text-sm font-medium text-[var(--text-muted)] tracking-wide">SKILLSYNC 3.0 IS LIVE</span>
+                        <span className="text-sm font-medium text-[var(--text-muted)] tracking-wide">THE CAREER ACCELERATOR</span>
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white mb-8 leading-[1.1]">
-                        Master your craft with <br className="hidden md:block" />
+                        Accelerate your career with <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)] animate-gradient-x">
                             intelligent acceleration
                         </span>
@@ -139,7 +171,7 @@ export default function Home() {
                             href="/roadmap"
                             className="group relative px-8 py-4 bg-white text-black rounded-full font-bold text-lg transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] overflow-hidden"
                         >
-                            <span className="relative z-10">Start Building Now</span>
+                            <span className="relative z-10">Start the journey</span>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
                         </Link>
                         <Link
@@ -154,7 +186,7 @@ export default function Home() {
                 {/* Hero Stats */}
                 <div className={`mt-20 grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16 border-t border-white/5 pt-10 transition-all duration-1000 delay-300 w-full max-w-4xl ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                     {stats.map((stat) => (
-                        <div key={stat.label} className="flex flex-col items-center p-4 rounded-2xl hover:bg-white/5 transition-colors">
+                        <div key={stat.label} className="flex flex-col items-center p-4 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
                             <span className="text-3xl md:text-4xl font-bold text-white mb-1">{stat.value}</span>
                             <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider">{stat.label}</span>
                         </div>
@@ -242,7 +274,7 @@ export default function Home() {
                         <div className="sticky top-24 h-fit">
                             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Your learning journey, choreographed</h2>
                             <p className="text-lg text-[var(--text-muted)] leading-relaxed mb-8">
-                                SkillSync keeps momentum high—from the moment you set a goal to the day you land your next role.
+                                AIcademy keeps momentum high—from the moment you set a goal to the day you land your next role.
                                 Each step is supported with automation, insights, and community energy.
                             </p>
                             <Link href="/roadmap" className="inline-flex items-center gap-2 text-[var(--primary)] font-bold hover:gap-3 transition-all">
@@ -339,7 +371,7 @@ export default function Home() {
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Ready to accelerate?</h2>
                     <p className="text-xl text-[var(--text-muted)] mb-12">
-                        Join thousands of developers who are building their future with SkillSync.
+                        Join thousands of developers who are building their future with AIcademy.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
@@ -359,7 +391,7 @@ export default function Home() {
             <footer className="border-t border-white/5 bg-black/20 pt-16 pb-8 px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
                     <div className="col-span-2 md:col-span-1">
-                        <div className="text-2xl font-black text-white mb-4 tracking-tighter">SkillSync.</div>
+                        <div className="text-2xl font-black text-white mb-4 tracking-tighter">AIcademy.</div>
                         <p className="text-sm text-[var(--text-muted)]">
                             The AI-powered career accelerator for modern developers.
                         </p>
@@ -389,7 +421,7 @@ export default function Home() {
                     </div>
                 </div>
                 <div className="max-w-7xl mx-auto border-t border-white/5 pt-8 text-center text-sm text-[var(--text-muted)]">
-                    © {new Date().getFullYear()} SkillSync Inc. All rights reserved.
+                    © {new Date().getFullYear()} AIcademy Inc. All rights reserved.
                 </div>
             </footer>
         </main>

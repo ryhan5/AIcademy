@@ -50,7 +50,7 @@ export default function RegisterPage() {
             <div className="glass-panel p-8 rounded-2xl w-full max-w-md border border-white/10">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-                    <p className="text-[var(--text-muted)]">Join SkillSync and accelerate your career</p>
+                    <p className="text-[var(--text-muted)]">Join AIcademy and accelerate your career</p>
                 </div>
 
                 {error && (

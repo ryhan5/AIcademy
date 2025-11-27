@@ -101,12 +101,12 @@ export default function Dashboard() {
                         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                             <div>
                                 <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                                    {isVerified ? '✅ SkillSync Verified' : '🎓 Capstone Project'}
+                                    {isVerified ? '✅ AIcademy Verified' : '🎓 Capstone Project'}
                                 </h3>
                                 <p className="text-[var(--text-muted)] max-w-md">
                                     {isVerified
                                         ? "You have successfully verified your skills. Your profile is now highlighted to recruiters."
-                                        : "Complete a final project to earn the 'SkillSync Verified' badge and boost your visibility."}
+                                        : "Complete a final project to earn the 'AIcademy Verified' badge and boost your visibility."}
                                 </p>
                             </div>
                             {!isVerified ? (

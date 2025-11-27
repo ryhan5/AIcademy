@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'SkillSync: The Career Accelerator',
+  title: 'AIcademy: The Career Accelerator',
   description: 'Don\'t just watch tutorials; build a portfolio and get hired.',
 };
 

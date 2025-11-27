@@ -3,7 +3,7 @@
  * Handles XP, levels, streaks, and progress tracking using localStorage
  */
 
-const STORAGE_KEY = 'skillsync_user_progress';
+const STORAGE_KEY = 'aicademy_user_progress';
 
 // XP required for each level (multiplier-based progression)
 const XP_PER_LEVEL = (level) => level * 200;
@@ -20,7 +20,7 @@ export const XP_REWARDS = {
 };
 
 // Initialize default user progress
-const getDefaultProgress = () => ({
+export const getDefaultProgress = () => ({
     userId: 'local',
     xp: 0,
     level: 1,
@@ -53,7 +53,7 @@ export const getUserProgress = () => {
 /**
  * Save user progress to localStorage
  */
-const saveProgress = (progress) => {
+export const saveProgress = (progress) => {
     if (typeof window === 'undefined') return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
 };
