@@ -71,7 +71,7 @@ export default function QuizPage() {
                     <div className="text-center mb-12">
                         <div className="text-6xl mb-4 animate-bounce-slow">🎉</div>
                         <h2 className="text-4xl sm:text-5xl font-black text-white mb-3">Quiz Complete!</h2>
-                        <p className="text-xl text-[var(--text-muted)]">Here's how you performed</p>
+                        <p className="text-xl text-[var(--text-muted)]">Here&apos;s how you performed</p>
                     </div>
 
                     {/* Score Card Grid */}

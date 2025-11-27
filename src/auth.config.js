@@ -1,4 +1,4 @@
-export default {
+const authConfig = {
     providers: [],
     pages: {
         signIn: "/login",
@@ -21,3 +21,5 @@ export default {
         strategy: "jwt",
     },
 };
+
+export default authConfig;

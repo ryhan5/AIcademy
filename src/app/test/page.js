@@ -11,6 +11,7 @@ export default function TestPage() {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         addLog("Page loaded");
         const prog = getUserProgress();
         setProgress(prog);

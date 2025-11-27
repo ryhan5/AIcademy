@@ -7,6 +7,7 @@ export default function Leaderboard() {
 
     useEffect(() => {
         const data = getLeaderboardData();
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLeaderboard(data);
     }, []);
 

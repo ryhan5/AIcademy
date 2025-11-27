@@ -6,6 +6,7 @@ export default function Home() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 
@@ -139,7 +140,7 @@ export default function Home() {
 
                 {/* Floating Code Snippets (Decorative) */}
                 <div className="absolute top-[15%] left-[5%] p-4 glass-card rounded-xl opacity-10 rotate-[-6deg] animate-float hidden lg:block">
-                    <pre className="text-xs text-[var(--primary)]"><code>git commit -m "feat: level up"</code></pre>
+                    <pre className="text-xs text-[var(--primary)]"><code>git commit -m &quot;feat: level up&quot;</code></pre>
                 </div>
                 <div className="absolute top-[20%] right-[8%] p-4 glass-card rounded-xl opacity-10 rotate-[12deg] animate-float delay-700 hidden lg:block">
                     <pre className="text-xs text-[var(--accent)]"><code>npm run build:career</code></pre>

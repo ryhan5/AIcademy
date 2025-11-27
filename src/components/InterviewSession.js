@@ -217,7 +217,7 @@ export default function InterviewSession({ setupData, onEnd }) {
                         <span className="text-4xl">📊</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-2">Interview Analysis</h2>
-                    <p className="text-[var(--text-muted)]">Here's how you performed</p>
+                    <p className="text-[var(--text-muted)]">Here&apos;s how you performed</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

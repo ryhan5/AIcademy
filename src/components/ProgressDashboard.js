@@ -10,11 +10,13 @@ export default function ProgressDashboard() {
         // Check daily login on mount
         const reward = checkDailyLogin();
         if (reward.xpAwarded > 0) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoginReward(reward);
         }
 
         // Load user progress
         const userProgress = getUserProgress();
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setProgress(userProgress);
     }, []);
 

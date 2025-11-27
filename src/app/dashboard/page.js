@@ -13,6 +13,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         // Load initial data
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUserProgress(getUserProgress());
         setLeaderboard(getLeaderboardData());
         setIsVerified(isUserVerified());
@@ -68,7 +69,7 @@ export default function Dashboard() {
                 <div className="lg:col-span-2 space-y-8">
                     <div className="animate-fade-in">
                         <h1 className="text-3xl font-bold text-white mb-2">Welcome back, Builder 👋</h1>
-                        <p className="text-[var(--text-muted)]">Here's your progress overview for today.</p>
+                        <p className="text-[var(--text-muted)]">Here&apos;s your progress overview for today.</p>
                     </div>
 
                     {userProgress && <ProgressDashboard progress={userProgress} />}

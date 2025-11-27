@@ -52,6 +52,7 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
         };
 
         fetchCourse();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [topic, duration, initialData]);
 
     const handleQuizAnswer = (questionIndex, answer) => {
@@ -390,7 +391,7 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
                                         <div className="text-center mb-10">
                                             <div className="text-6xl mb-4">🎉</div>
                                             <h3 className="text-3xl font-bold text-white mb-2">Quiz Completed!</h3>
-                                            <p className="text-[var(--text-muted)]">You've earned XP for your progress.</p>
+                                            <p className="text-[var(--text-muted)]">You&apos;ve earned XP for your progress.</p>
                                         </div>
 
                                         <div className="space-y-6 mb-10">
