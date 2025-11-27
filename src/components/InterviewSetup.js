@@ -5,13 +5,13 @@ import Link from 'next/link';
 
 export default function InterviewSetup({ onStart }) {
     const [role, setRole] = useState('');
-    const [stack, setStack] = useState('');
+    // const [stack, setStack] = useState(''); // Removed
     const [experience, setExperience] = useState('Junior');
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (role.trim() && stack.trim()) {
-            onStart({ role, stack, experience });
+        if (role.trim()) {
+            onStart({ role, experience });
         }
     };
 
@@ -43,18 +43,7 @@ export default function InterviewSetup({ onStart }) {
                     />
                 </div>
 
-                {/* Tech Stack Input */}
-                <div className="space-y-3">
-                    <label className="block text-sm font-bold text-white ml-1 uppercase tracking-wider">Tech Stack</label>
-                    <input
-                        type="text"
-                        value={stack}
-                        onChange={(e) => setStack(e.target.value)}
-                        placeholder="e.g., React, Node.js, AWS..."
-                        className="w-full p-5 bg-black/20 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:border-[var(--primary)] focus:bg-black/30 transition-all text-lg shadow-inner"
-                        required
-                    />
-                </div>
+
 
                 {/* Experience Level */}
                 <div className="space-y-3">
@@ -82,7 +71,7 @@ export default function InterviewSetup({ onStart }) {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    disabled={!role.trim() || !stack.trim()}
+                    disabled={!role.trim()}
                     className="w-full py-5 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-2xl font-bold text-lg hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all relative overflow-hidden group mt-4"
                 >
                     <span className="relative z-10 flex items-center justify-center gap-2">

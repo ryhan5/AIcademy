@@ -3,11 +3,10 @@ import { NextResponse } from 'next/server';
 export async function POST(req) {
     try {
         const { messages, context } = await req.json();
-        const { role, stack, experience } = context;
+        const { role, experience } = context;
 
         const systemPrompt = `
             You are an expert technical interviewer conducting a mock interview for a ${experience} ${role} position. 
-            The candidate's tech stack is: ${stack}.
             
             Your goal is to assess their technical knowledge, problem-solving skills, and communication.
             
@@ -29,10 +28,17 @@ export async function POST(req) {
             content: m.content
         }));
 
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) {
+            console.error("GROQ_API_KEY is missing");
+            throw new Error("GROQ_API_KEY is missing from environment variables");
+        }
+        console.log(`Calling Groq API with key: ${apiKey.substring(0, 5)}...`);
+
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({

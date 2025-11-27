@@ -29,11 +29,9 @@ export async function POST(req) {
 Generate a JSON course structure with EXACTLY ${chapterCount} chapters.
 
 IMPORTANT REQUIREMENTS:
-1. Each chapter must have 2-3 REAL YouTube video recommendations
-   - Search for actual popular tutorials from: Traversy Media, freeCodeCamp, Fireship, Web Dev Simplified, The Net Ninja, Programming with Mosh
-   - For "url", generate a YouTube Search URL: "https://www.youtube.com/results?search_query=TOPIC%20CHANNEL_NAME"
-   - Example: "https://www.youtube.com/results?search_query=React%20Crash%20Course%20Traversy%20Media"
-   - This ensures links never break.
+3. Each chapter must have 2-3 REAL, SPECIFIC YouTube video recommendations
+   - Provide a searchQuery that will find the best video for this topic.
+   - Example: "React Crash Course 2024 Traversy Media"
    - Include video duration in title
 
 2. Each chapter must have 3-5 quiz questions SPECIFICALLY about the chapter topic
@@ -61,8 +59,8 @@ Return ONLY this JSON structure:
       "videos": [
         {
           "title": "Specific video title - 25min",
-          "url": "https://youtube.com/watch?v=REAL_VIDEO_ID",
-          "creator": "Actual YouTube Channel Name"
+          "searchQuery": "React Crash Course 2024 Traversy Media",
+          "creator": "Traversy Media"
         }
       ],
       "materials": [

@@ -264,25 +264,72 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
                                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                                         <span>📺</span> Video Tutorials
                                     </h3>
-                                    <div className="grid gap-4">
-                                        {currentChapter.videos.map((video, idx) => (
-                                            <a
-                                                key={idx}
-                                                href={video.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-start gap-4 p-5 glass-card rounded-2xl hover:border-[var(--primary)]/50 hover:bg-white/5 transition-all group"
-                                            >
-                                                <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 text-xl group-hover:scale-110 transition-transform">
-                                                    ▶
+                                    <div className="grid gap-6">
+                                        {currentChapter.videos.map((video, idx) => {
+                                            // Extract ID or Search Query
+                                            let videoId = video.videoId;
+                                            let searchQuery = video.searchQuery || null;
+
+                                            if (!videoId && video.url) {
+                                                try {
+                                                    const urlObj = new URL(video.url);
+                                                    if (urlObj.hostname.includes('youtube.com')) {
+                                                        if (urlObj.searchParams.get('v')) {
+                                                            videoId = urlObj.searchParams.get('v');
+                                                        } else if (urlObj.pathname.startsWith('/embed/')) {
+                                                            videoId = urlObj.pathname.split('/')[2];
+                                                        } else if (urlObj.pathname === '/results' && urlObj.searchParams.get('search_query')) {
+                                                            searchQuery = urlObj.searchParams.get('search_query');
+                                                        }
+                                                    } else if (urlObj.hostname === 'youtu.be') {
+                                                        videoId = urlObj.pathname.slice(1);
+                                                    }
+                                                } catch (e) {
+                                                    console.warn('Invalid video URL:', video.url);
+                                                }
+                                            }
+
+                                            // Fallback: If no ID and no search query extracted, but we have a title, use title as search query
+                                            if (!videoId && !searchQuery && video.title) {
+                                                searchQuery = `${video.title} ${video.creator || ''} tutorial`;
+                                            }
+
+                                            const embedSrc = videoId
+                                                ? `https://www.youtube.com/embed/${videoId}`
+                                                : `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(searchQuery || 'programming tutorial')}`;
+
+                                            return (
+                                                <div key={idx} className="glass-card rounded-2xl overflow-hidden border border-white/5 bg-black/20">
+                                                    <div className="aspect-video w-full">
+                                                        <iframe
+                                                            width="100%"
+                                                            height="100%"
+                                                            src={embedSrc}
+                                                            title={video.title}
+                                                            frameBorder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowFullScreen
+                                                            className="w-full h-full"
+                                                        ></iframe>
+                                                    </div>
+                                                    <div className="p-4 border-t border-white/5 flex items-center justify-between">
+                                                        <div>
+                                                            <h4 className="font-bold text-white mb-1">{video.title}</h4>
+                                                            <p className="text-sm text-[var(--text-muted)]">By {video.creator}</p>
+                                                        </div>
+                                                        <a
+                                                            href={videoId ? `https://www.youtube.com/watch?v=${videoId}` : `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery || video.title)}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-[var(--text-muted)] hover:text-white transition-colors"
+                                                            title="Open in YouTube"
+                                                        >
+                                                            ↗
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1">
-                                                    <h4 className="font-bold text-white group-hover:text-[var(--primary)] transition-colors mb-1">{video.title}</h4>
-                                                    <p className="text-sm text-[var(--text-muted)]">By {video.creator}</p>
-                                                </div>
-                                                <div className="text-[var(--text-muted)] group-hover:translate-x-1 transition-transform">↗</div>
-                                            </a>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
 
@@ -443,9 +490,9 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
                                 )}
                             </div>
                         )}
-                    </div>
-                </div>
-            </div>
+                    </div >
+                </div >
+            </div >
         </>
     );
 }
