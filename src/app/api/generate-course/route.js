@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Course from "@/models/Course";
 import User from "@/models/User";
+import { searchYouTubeVideos } from "@/lib/youtubeService";
 
 export async function POST(req) {
   try {
@@ -28,24 +29,26 @@ export async function POST(req) {
 
 Generate a JSON course structure with EXACTLY ${chapterCount} chapters.
 
-IMPORTANT REQUIREMENTS:
-3. Each chapter must have 2-3 REAL, SPECIFIC YouTube video recommendations
-   - Provide a searchQuery that will find the best video for this topic.
-   - Example: "React Crash Course 2024 Traversy Media"
-   - Include video duration in title
+VIDEO SEARCH QUERIES:
+- For each chapter, provide 2-3 YouTube SEARCH QUERIES (NOT video IDs)
+- These will be used to find REAL videos via YouTube API
+- Make queries specific and targeted (e.g., "React Hooks complete tutorial", "JavaScript async await explained")
+- Include popular channel names in queries when relevant (freeCodeCamp, Traversy Media, etc.)
 
-2. Each chapter must have 3-5 quiz questions SPECIFICALLY about the chapter topic
-   - Questions should test actual knowledge about ${topic}
-   - Provide clear explanations for correct answers
-   - Make questions practical and relevant
+FLASHCARDS (IMPORTANT):
+- Instead of external links, generate 3-5 FLASHCARDS for each chapter.
+- These should test key concepts from the chapter.
+- Format: { "front": "Concept/Question", "back": "Definition/Answer" }
 
-3. Include real documentation links (MDN, official docs, etc.)
+QUIZ REQUIREMENTS:
+- Each chapter must have 3-5 quiz questions SPECIFICALLY about the chapter topic
+- Questions should test actual knowledge about ${topic}
+- Provide clear explanations for correct answers
 
 IMPORTANT: Return PURE VALID JSON. 
-- Do NOT use string concatenation (e.g. ' + ').
-- Do NOT use single quotes for JSON keys/values (use double quotes).
-- Do NOT use comments.
-- Ensure arrays like "materials" are actual JSON arrays of objects, not strings.
+- Do NOT use string concatenation or comments
+- Use double quotes for all JSON keys/values
+- Ensure arrays are actual JSON arrays
 
 Return ONLY this JSON structure:
 {
@@ -56,18 +59,14 @@ Return ONLY this JSON structure:
       "id": 1,
       "title": "Chapter title about specific ${topic} concept",
       "description": "What students will learn",
-      "videos": [
-        {
-          "title": "Specific video title - 25min",
-          "searchQuery": "React Crash Course 2024 Traversy Media",
-          "creator": "Traversy Media"
-        }
+      "videoSearchQueries": [
+        "Specific search query for ${topic} tutorial",
+        "Another search query for ${topic}"
       ],
-      "materials": [
+      "flashcards": [
         {
-          "title": "Resource name",
-          "type": "Documentation",
-          "url": "https://real-documentation-url.com"
+          "front": "Key Concept",
+          "back": "Clear, concise definition or explanation of the concept."
         }
       ],
       "keyConcepts": ["Specific concept 1", "Specific concept 2"],
@@ -137,10 +136,67 @@ Return ONLY this JSON structure:
       throw new Error("User not found");
     }
 
+    // Fetch real YouTube videos for each chapter
+    console.log('========================================');
+    console.log('FETCHING REAL YOUTUBE VIDEOS...');
+    console.log('========================================');
+
+    for (let i = 0; i < courseData.chapters.length; i++) {
+      const chapter = courseData.chapters[i];
+      console.log(`\nChapter ${i + 1}: ${chapter.title}`);
+      console.log('videoSearchQueries:', chapter.videoSearchQueries);
+
+      const videos = [];
+
+      if (chapter.videoSearchQueries && Array.isArray(chapter.videoSearchQueries)) {
+        console.log(`Found ${chapter.videoSearchQueries.length} search queries`);
+
+        // Fetch videos for each search query
+        for (const query of chapter.videoSearchQueries) {
+          console.log(`  Searching YouTube for: "${query}"`);
+          try {
+            const youtubeResults = await searchYouTubeVideos(query, 1);
+            console.log(`  Results found: ${youtubeResults?.length || 0}`);
+
+            if (youtubeResults && youtubeResults.length > 0) {
+              console.log(`  ✅ Added video: ${youtubeResults[0].title} (ID: ${youtubeResults[0].videoId})`);
+              videos.push(youtubeResults[0]);
+            } else {
+              console.log(`  ❌ No videos found for query`);
+            }
+          } catch (error) {
+            console.error(`  ❌ Error fetching videos for query "${query}":`, error.message);
+          }
+        }
+      } else {
+        console.log('⚠️  NO videoSearchQueries found in chapter! AI did not generate search queries.');
+      }
+
+      console.log(`Final videos count for chapter: ${videos.length}`);
+
+      // Replace videoSearchQueries with actual videos array
+      delete chapter.videoSearchQueries;
+      chapter.videos = videos.length > 0 ? videos : [
+        // Fallback video structure if YouTube API fails
+        {
+          title: `${chapter.title} - Tutorial`,
+          searchQuery: `${chapter.title} ${topic} tutorial`,
+          creator: 'Educational Content'
+        }
+      ];
+
+      console.log(`Saved videos:`, chapter.videos.map(v => ({ title: v.title, videoId: v.videoId || 'NO ID' })));
+    }
+
+    console.log('\n========================================');
+    console.log('YOUTUBE VIDEO FETCHING COMPLETE');
+    console.log('========================================\n');
+
     // Sanitize data before saving
+    // NOTE: We skip 'videos' field since we just populated it with clean YouTube API data
     courseData.chapters = courseData.chapters.map(chapter => {
-      // Ensure arrays are actually arrays
-      ['videos', 'materials', 'quiz', 'keyConcepts'].forEach(field => {
+      // Ensure arrays are actually arrays (but skip videos - it's already clean)
+      ['flashcards', 'quiz', 'keyConcepts'].forEach(field => {
         let items = chapter[field];
 
         // 1. Handle if the entire field is a string

@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
 
 const VideoSchema = new mongoose.Schema({
-    title: String,
-    url: String,
-    creator: String
+    videoId: String,        // YouTube video ID (e.g., "dQw4w9WgXcQ")
+    title: String,          // Video title
+    url: String,            // Legacy field (kept for backwards compatibility)
+    creator: String,        // Channel name
+    searchQuery: String,    // Fallback search query
+    duration: String,       // Video duration (e.g., "15min", "1hr")
+    thumbnail: String       // Video thumbnail URL
 });
 
 const MaterialSchema = new mongoose.Schema({
@@ -19,12 +23,18 @@ const QuizSchema = new mongoose.Schema({
     explanation: String
 });
 
+const FlashcardSchema = new mongoose.Schema({
+    front: String,
+    back: String
+});
+
 const ChapterSchema = new mongoose.Schema({
     id: Number,
     title: String,
     description: String,
     videos: [VideoSchema],
-    materials: [MaterialSchema],
+    materials: [MaterialSchema], // Keeping for backward compatibility
+    flashcards: [FlashcardSchema],
     keyConcepts: [String],
     quiz: [QuizSchema]
 });

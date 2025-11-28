@@ -211,7 +211,7 @@ export default function InterviewSession({ setupData, onEnd }) {
 
     if (feedback) {
         return (
-            <div className="glass-panel rounded-[2.5rem] max-w-4xl w-full p-8 border border-white/10 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+            <div className="bg-[#0a0a0a]/40 backdrop-blur-xl rounded-[2.5rem] max-w-4xl w-full p-8 border border-white/5 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
                 <div className="text-center mb-8">
                     <div className="inline-block p-4 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] mb-4 shadow-lg">
                         <span className="text-4xl">📊</span>
@@ -221,11 +221,11 @@ export default function InterviewSession({ setupData, onEnd }) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="col-span-1 bg-white/5 rounded-3xl p-6 border border-white/10 flex flex-col items-center justify-center text-center">
+                    <div className="col-span-1 bg-white/5 rounded-3xl p-6 border border-white/5 flex flex-col items-center justify-center text-center">
                         <div className="text-5xl font-bold text-[var(--accent)] mb-2">{feedback.score}</div>
-                        <div className="text-sm text-[var(--text-muted)] uppercase tracking-wider">Overall Score</div>
+                        <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Overall Score</div>
                     </div>
-                    <div className="col-span-2 bg-white/5 rounded-3xl p-6 border border-white/10">
+                    <div className="col-span-2 bg-white/5 rounded-3xl p-6 border border-white/5">
                         <h3 className="text-lg font-bold text-white mb-3">Summary</h3>
                         <p className="text-[var(--text-muted)] leading-relaxed">{feedback.feedback}</p>
                     </div>
@@ -266,7 +266,7 @@ export default function InterviewSession({ setupData, onEnd }) {
                     </h3>
                     <div className="space-y-4">
                         {feedback.improvement_plan.map((step, i) => (
-                            <div key={i} className="flex items-center gap-4 bg-black/20 p-4 rounded-2xl">
+                            <div key={i} className="flex items-center gap-4 bg-black/20 p-4 rounded-2xl border border-white/5">
                                 <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">
                                     {i + 1}
                                 </div>
@@ -288,7 +288,7 @@ export default function InterviewSession({ setupData, onEnd }) {
 
     if (generatingFeedback) {
         return (
-            <div className="glass-panel rounded-[2.5rem] max-w-2xl w-full p-12 border border-white/10 shadow-2xl animate-fade-in flex flex-col items-center text-center">
+            <div className="bg-[#0a0a0a]/40 backdrop-blur-xl rounded-[2.5rem] max-w-2xl w-full p-12 border border-white/5 shadow-2xl animate-fade-in flex flex-col items-center text-center">
                 <div className="w-20 h-20 rounded-full bg-[var(--primary)]/20 flex items-center justify-center mb-6 animate-pulse">
                     <span className="text-4xl">🧠</span>
                 </div>
@@ -299,9 +299,9 @@ export default function InterviewSession({ setupData, onEnd }) {
     }
 
     return (
-        <div className="glass-panel rounded-[2.5rem] max-w-6xl w-full h-[90vh] flex flex-col border border-white/10 shadow-2xl relative overflow-hidden animate-fade-in">
+        <div className="bg-[#0a0a0a]/40 backdrop-blur-xl rounded-[2.5rem] max-w-6xl w-full h-[90vh] flex flex-col border border-white/5 shadow-2xl relative overflow-hidden animate-fade-in">
             {/* Header & Avatar */}
-            <div className="p-6 border-b border-white/10 bg-black/20 flex justify-between items-center relative overflow-hidden">
+            <div className="p-6 border-b border-white/5 bg-black/20 flex justify-between items-center relative overflow-hidden">
                 <div className="flex items-center gap-6 relative z-10">
                     <div className="relative">
                         <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center text-3xl shadow-lg relative z-10 transition-transform ${isSpeaking ? 'scale-110' : 'scale-100'}`}>
@@ -376,7 +376,7 @@ export default function InterviewSession({ setupData, onEnd }) {
                         <div
                             className={`max-w-[80%] p-5 rounded-3xl text-lg leading-relaxed ${msg.role === 'user'
                                 ? 'bg-[var(--primary)] text-white rounded-tr-none shadow-[0_5px_15px_rgba(124,58,237,0.3)]'
-                                : 'bg-white/10 text-white/90 rounded-tl-none border border-white/5'
+                                : 'bg-white/5 text-white/90 rounded-tl-none border border-white/5'
                                 }`}
                         >
                             {msg.content}
@@ -396,7 +396,7 @@ export default function InterviewSession({ setupData, onEnd }) {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSend} className="p-6 border-t border-white/10 bg-black/20">
+            <form onSubmit={handleSend} className="p-6 border-t border-white/5 bg-black/20">
                 <div className="relative flex gap-4">
                     <button
                         type="button"

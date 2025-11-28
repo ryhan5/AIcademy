@@ -7,17 +7,11 @@ export default function ProgressDashboard() {
     const [loginReward, setLoginReward] = useState(null);
 
     useEffect(() => {
-        // Check daily login on mount
         const reward = checkDailyLogin();
         if (reward.xpAwarded > 0) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoginReward(reward);
         }
-
-        // Load user progress
-        const userProgress = getUserProgress();
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setProgress(userProgress);
+        setProgress(getUserProgress());
     }, []);
 
     if (!progress) return null;
@@ -26,7 +20,8 @@ export default function ProgressDashboard() {
     const progressPercent = (xpInCurrentLevel / xpForNextLevel) * 100;
 
     return (
-        <div className="glass-panel p-8 rounded-3xl animate-fade-in border border-white/10 relative overflow-hidden group">
+        <div className="bg-[#0a0a0a]/40 backdrop-blur-xl p-8 rounded-3xl animate-fade-in border border-white/5 relative overflow-hidden group">
+            {/* Ambient Glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--primary)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-[var(--primary)]/20 transition-colors duration-500"></div>
 
             {/* Daily Login Notification */}
@@ -51,7 +46,7 @@ export default function ProgressDashboard() {
 
                 {/* Streak Counter */}
                 <div className="text-right">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 transition-colors">
                         <span className="text-xl">{progress.streak > 0 ? '🔥' : '❄️'}</span>
                         <span className="text-2xl font-black text-white">{progress.streak}</span>
                         <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Days</span>
@@ -63,7 +58,7 @@ export default function ProgressDashboard() {
             <div className="mb-8 relative z-10">
                 <div className="flex justify-between items-end mb-3">
                     <div>
-                        <span className="text-4xl font-black text-white">Lvl {level}</span>
+                        <span className="text-4xl font-black text-white tracking-tight">Lvl {level}</span>
                     </div>
                     <div className="text-right">
                         <span className="text-sm font-medium text-[var(--primary)]">{Math.round(progressPercent)}%</span>
@@ -72,7 +67,7 @@ export default function ProgressDashboard() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="h-4 bg-black/20 rounded-full overflow-hidden border border-white/5">
+                <div className="h-4 bg-black/40 rounded-full overflow-hidden border border-white/5">
                     <div
                         className="h-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--secondary)] transition-all duration-1000 ease-out relative"
                         style={{ width: `${progressPercent}%` }}
@@ -80,43 +75,30 @@ export default function ProgressDashboard() {
                         <div className="absolute inset-0 bg-white/20 animate-pulse-slow"></div>
                     </div>
                 </div>
-                <div className="mt-2 text-xs text-[var(--text-muted)] text-right">
+                <div className="mt-2 text-xs text-[var(--text-muted)] text-right font-mono">
                     {xpInCurrentLevel.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP
                 </div>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-4 relative z-10">
-                <div className="text-center p-4 glass-card rounded-2xl hover:bg-white/5 transition-colors">
+                <div className="text-center p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
                     <div className="text-2xl mb-1">✨</div>
                     <p className="text-xl font-bold text-white">{progress.xp.toLocaleString()}</p>
-                    <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">Total XP</p>
+                    <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Total XP</p>
                 </div>
 
-                <div className="text-center p-4 glass-card rounded-2xl hover:bg-white/5 transition-colors">
+                <div className="text-center p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
                     <div className="text-2xl mb-1">📚</div>
                     <p className="text-xl font-bold text-white">{progress.completedModules.length}</p>
-                    <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">Modules</p>
+                    <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Modules</p>
                 </div>
 
-                <div className="text-center p-4 glass-card rounded-2xl hover:bg-white/5 transition-colors">
+                <div className="text-center p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
                     <div className="text-2xl mb-1">🚀</div>
                     <p className="text-xl font-bold text-white">{progress.completedRoadmaps.length}</p>
-                    <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">Roadmaps</p>
+                    <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wide">Roadmaps</p>
                 </div>
-            </div>
-
-            {/* Motivational Message */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-[var(--primary)]/10 to-[var(--secondary)]/10 border border-white/5 rounded-2xl relative z-10">
-                <p className="text-sm text-center font-medium text-white/90">
-                    {progress.streak >= 7 ? (
-                        "🌟 Unstoppable! You're crushing your goals!"
-                    ) : progress.streak >= 3 ? (
-                        "💪 Consistency is key. You're doing great!"
-                    ) : (
-                        "🚀 Every expert was once a beginner. Keep going!"
-                    )}
-                </p>
             </div>
         </div>
     );

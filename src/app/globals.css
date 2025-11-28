@@ -2,5 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
-/* Most styles are in variables.css and glassmorphism.css */
+/* Custom Utilities for 3D Transforms (Optional, as we use arbitrary values now) */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.transform-style-3d {
+    transform-style: preserve-3d;
+}
+
+.backface-hidden {
+    backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+    transform: rotateY(180deg);
+}

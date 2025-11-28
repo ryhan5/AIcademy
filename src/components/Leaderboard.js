@@ -2,16 +2,16 @@
 import { useState, useEffect } from 'react';
 import { getLeaderboardData } from '../utils/UserProgress';
 
-export default function Leaderboard() {
-    const [leaderboard, setLeaderboard] = useState(null);
+export default function Leaderboard({ leaderboard: initialData, currentUserXP }) {
+    const [leaderboard, setLeaderboard] = useState(initialData || null);
 
     useEffect(() => {
-        const data = getLeaderboardData();
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLeaderboard(data);
-    }, []);
+        if (!initialData) {
+            setLeaderboard(getLeaderboardData());
+        }
+    }, [initialData]);
 
-    if (!leaderboard) return null;
+    if (!leaderboard || !leaderboard.topUsers) return null;
 
     const { topUsers, userRank } = leaderboard;
 
@@ -23,20 +23,20 @@ export default function Leaderboard() {
     };
 
     return (
-        <div className="glass-panel p-8 rounded-3xl animate-fade-in border border-white/10 h-full">
-            <div className="flex items-center justify-between mb-8">
+        <div className="bg-[#0a0a0a]/40 backdrop-blur-xl p-6 rounded-3xl animate-fade-in border border-white/5 h-full flex flex-col">
+            <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">🏆 Leaderboard</h2>
-                    <p className="text-[var(--text-muted)] text-sm mt-1">Top learners this week</p>
+                    <h2 className="text-xl font-bold text-white">🏆 Leaderboard</h2>
+                    <p className="text-[var(--text-muted)] text-xs mt-1">Top learners this week</p>
                 </div>
-                <div className="px-4 py-2 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-full">
-                    <span className="text-sm text-[var(--text-muted)]">
+                <div className="px-3 py-1.5 bg-[var(--primary)]/10 border border-[var(--primary)]/20 rounded-full">
+                    <span className="text-xs text-[var(--text-muted)]">
                         Rank: <span className="font-bold text-[var(--primary)]">#{userRank}</span>
                     </span>
                 </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10">
                 {topUsers.map((user, index) => {
                     const rank = index + 1;
                     const isCurrentUser = user.username === 'You';
@@ -45,39 +45,33 @@ export default function Leaderboard() {
                     return (
                         <div
                             key={user.userId}
-                            className={`p-4 rounded-2xl transition-all flex items-center gap-4 ${isCurrentUser
-                                ? 'bg-[var(--primary)]/20 border border-[var(--primary)]/50 shadow-[0_0_20px_rgba(124,58,237,0.1)]'
+                            className={`p-3 rounded-xl transition-all flex items-center gap-3 ${isCurrentUser
+                                ? 'bg-[var(--primary)]/10 border border-[var(--primary)]/30 shadow-[0_0_15px_rgba(124,58,237,0.1)]'
                                 : 'bg-white/5 border border-white/5 hover:bg-white/10'
                                 }`}
                         >
-                            <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold text-lg ${rank <= 3 ? 'bg-white/10 text-2xl' : 'text-[var(--text-muted)]'
+                            <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold text-sm ${rank <= 3 ? 'bg-white/10 text-lg' : 'text-[var(--text-muted)]'
                                 }`}>
                                 {medal || rank}
                             </div>
 
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <p className={`font-bold ${isCurrentUser ? 'text-white' : 'text-white/90'}`}>
+                                    <p className={`font-bold text-sm truncate ${isCurrentUser ? 'text-white' : 'text-white/90'}`}>
                                         {user.username}
                                     </p>
-                                    {isCurrentUser && <span className="text-[10px] bg-[var(--primary)] text-white px-2 py-0.5 rounded-full">YOU</span>}
+                                    {isCurrentUser && <span className="text-[9px] bg-[var(--primary)] text-white px-1.5 py-0.5 rounded-full font-bold">YOU</span>}
                                 </div>
-                                <p className="text-xs text-[var(--text-muted)]">Level {user.level}</p>
+                                <p className="text-[10px] text-[var(--text-muted)]">Level {user.level}</p>
                             </div>
 
                             <div className="text-right">
-                                <p className="font-bold text-[var(--accent)]">{user.xp.toLocaleString()}</p>
-                                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">XP</p>
+                                <p className="font-bold text-sm text-[var(--accent)]">{user.xp.toLocaleString()}</p>
+                                <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-wider">XP</p>
                             </div>
                         </div>
                     );
                 })}
-            </div>
-
-            <div className="mt-6 p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-                <p className="text-xs text-center text-blue-200/80 leading-relaxed">
-                    💡 <span className="font-bold text-blue-200">Pro Tip:</span> Complete daily challenges and maintain your streak to climb the ranks faster!
-                </p>
             </div>
         </div>
     );

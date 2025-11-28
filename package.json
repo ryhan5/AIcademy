@@ -10,9 +10,13 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@monaco-editor/react": "^4.7.0",
+    "@mozilla/readability": "^0.6.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "groq-sdk": "^0.36.0",
+    "html2canvas": "^1.4.1",
+    "jsdom": "^27.2.0",
     "mongoose": "^9.0.0",
     "next": "16.0.4",
     "next-auth": "^5.0.0-beta.30",
