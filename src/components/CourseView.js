@@ -4,6 +4,7 @@ import { markModuleComplete, isModuleComplete, awardXP, XP_REWARDS } from '../ut
 import XPNotification from './XPNotification';
 import MentorChat from './MentorChat';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 export default function CourseView({ topic, duration, initialData, onCourseGenerated }) {
@@ -16,6 +17,7 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
     const [showResults, setShowResults] = useState(false);
     const [xpNotification, setXpNotification] = useState(null);
     const [showMentor, setShowMentor] = useState(false);
+    const router = useRouter();
 
 
     // Reader Mode Logic
@@ -79,7 +81,7 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
         setShowResults(true);
     };
 
-    const handleCompleteChapter = () => {
+    const handleCompleteChapter = async () => {
         const moduleId = `course_${topic}_ch${activeChapter}`;
         const reward = markModuleComplete(moduleId, topic);
         if (reward) {
@@ -91,6 +93,35 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
             setQuizMode(false);
             setQuizAnswers({});
             setShowResults(false);
+            setActiveTab('watch');
+        } else {
+            // Course Finished Logic
+            try {
+                const res = await fetch('/api/complete-course', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: course.topic })
+                });
+                const data = await res.json();
+
+                if (data.skillUpdate) {
+                    // Show a specific notification for skill boost
+                    setTimeout(() => {
+                        setXpNotification({
+                            xp: data.skillUpdate.boost,
+                            reason: `📈 ${data.skillUpdate.subject} Skill Boosted!`
+                        });
+                    }, 2000); // Show after the XP notification
+
+                    if (data.newProject) {
+                        setTimeout(() => {
+                            alert(`🎉 New Portfolio Project Unlocked: ${data.newProject.title}`);
+                        }, 4000);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to complete course", err);
+            }
         }
     };
 
@@ -122,26 +153,34 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
 
 
 
+    // Tab State
+    const [activeTab, setActiveTab] = useState('watch'); // 'watch', 'read', 'practice'
+
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center h-full animate-fade-in">
-                <div className="relative w-24 h-24 mb-8">
-                    <div className="absolute inset-0 border-4 border-[var(--primary)]/30 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+            <div className="relative w-full h-full flex items-center justify-center animate-in fade-in zoom-in-95 duration-500">
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-3xl opacity-50"></div>
+                <div className="relative p-12 flex flex-col items-center justify-center text-center">
+                    <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 relative overflow-hidden shadow-2xl">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    </div>
+                    <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-wide">Generating Course</h3>
+                    <p className="text-gray-500 font-medium">Curating the best content for {topic}...</p>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Generating Course...</h3>
-                <p className="text-[var(--text-muted)]">Curating the best YouTube content for you</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                <div className="text-red-400 text-xl mb-4">⚠️ {error}</div>
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl border border-red-500/20">⚠️</div>
+                <h3 className="text-xl font-black text-white mb-2">Generation Failed</h3>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">{error}</p>
                 <button
                     onClick={() => window.location.reload()}
-                    className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+                    className="px-8 py-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all font-black text-xs uppercase tracking-widest text-white border border-white/10"
                 >
                     Try Again
                 </button>
@@ -157,7 +196,7 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
     const isChapterComplete = isModuleComplete(`course_${topic || course.topic}_ch${activeChapter}`, topic || course.topic);
 
     return (
-        <div className="h-full flex flex-col relative">
+        <div className="flex h-full text-white overflow-hidden font-inter selection:bg-purple-500/30">
             {xpNotification && (
                 <XPNotification
                     xp={xpNotification.xp}
@@ -166,354 +205,337 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
                 />
             )}
 
-            {/* Sticky Glass Header */}
-            <div className="sticky top-0 z-30 px-8 py-4 bg-black/40 backdrop-blur-xl border-b border-white/5 flex justify-between items-center">
-                <div>
-                    <h1 className="text-xl font-bold text-white mb-1">{course.topic}</h1>
-                    <div className="flex items-center gap-4 text-xs font-medium text-[var(--text-muted)]">
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]"></span>
-                            {course.duration}
-                        </span>
-                        <span>•</span>
-                        <span>{course.chapters?.length || 0} Chapters</span>
+            {/* SIDEBAR NAVIGATION */}
+            <aside className="w-80 flex-shrink-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-r border-white/10 flex flex-col z-20">
+                <div className="p-6 border-b border-white/10 bg-white/[0.02]">
+                    <button onClick={() => router.push('/dashboard')} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white mb-4 transition-colors">
+                        ← Dashboard
+                    </button>
+                    <h1 className="text-lg font-black text-white leading-tight mb-3 tracking-tight line-clamp-2">{course.topic}</h1>
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        <span className="px-2 py-1 rounded bg-white/5 border border-white/5">{course.chapters.length} Chapters</span>
+                        <span className="px-2 py-1 rounded bg-white/5 border border-white/5">{course.duration}</span>
                     </div>
                 </div>
-                <div className="flex gap-3">
 
-                    <button
-                        onClick={() => { setShowMentor(!showMentor); setActiveDoc(null); }}
-                        className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 border shadow-lg ${showMentor ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-[var(--primary)]/20' : 'bg-white/5 border-white/10 text-[var(--text-muted)] hover:text-white hover:bg-white/10'}`}
-                    >
-                        <span>🤖</span>
-                        <span className="hidden md:inline font-medium">AI Mentor</span>
-                    </button>
+                <div className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-thin scrollbar-thumb-white/10">
+                    {course.chapters.map((chap, idx) => {
+                        const isActive = activeChapter === idx;
+                        const isCompleted = idx < activeChapter || isModuleComplete(`course_${topic || course.topic}_ch${idx}`, topic || course.topic);
+
+                        return (
+                            <button
+                                key={idx}
+                                onClick={() => {
+                                    setActiveChapter(idx);
+                                    setQuizMode(false);
+                                    setShowResults(false);
+                                    setActiveTab('watch'); // Reset to watch on chapter change
+                                }}
+                                className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 group relative overflow-hidden ${isActive
+                                    ? 'bg-purple-500/10 border-purple-500/30 shadow-lg'
+                                    : 'bg-transparent border-transparent hover:bg-white/5'
+                                    }`}
+                            >
+                                <div className="flex items-start gap-4 relative z-10">
+                                    <div className={`mt-0.5 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] border flex-shrink-0 font-black ${isActive
+                                        ? 'bg-purple-500 text-white border-purple-400'
+                                        : isCompleted
+                                            ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
+                                            : 'bg-white/5 border-white/10 text-gray-500'
+                                        }`}>
+                                        {isCompleted ? '✓' : idx + 1}
+                                    </div>
+                                    <div>
+                                        <div className={`text-xs font-bold mb-1 line-clamp-1 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-200'}`}>
+                                            {chap.title}
+                                        </div>
+                                        <div className="text-[9px] text-gray-600 font-bold uppercase tracking-wide">Video & Quiz</div>
+                                    </div>
+                                </div>
+                                {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>}
+                            </button>
+                        );
+                    })}
                 </div>
-            </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex overflow-hidden relative">
-                {/* Left: Content */}
-                <div className="flex-1 overflow-y-auto p-6 md:p-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent transition-all duration-300 min-w-0">
-                    <div className="max-w-5xl mx-auto space-y-10">
-
-                        {/* Timeline Navigation */}
-                        <div className="relative flex items-center justify-between mb-12 px-2">
-                            {/* Connecting Line */}
-                            <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-white/5 -z-10"></div>
-
-                            {course.chapters?.map((chap, idx) => {
-                                const isActive = activeChapter === idx;
-                                const isCompleted = idx < activeChapter; // Simplified for now
-                                return (
-                                    <button
-                                        key={idx}
-                                        onClick={() => {
-                                            setActiveChapter(idx);
-                                            setQuizMode(false);
-                                            setShowResults(false);
-                                        }}
-                                        className={`relative group flex flex-col items-center gap-3 transition-all ${isActive ? 'scale-110' : 'hover:scale-105'}`}
-                                    >
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${isActive
-                                            ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-[0_0_20px_-5px_var(--primary)]'
-                                            : isCompleted
-                                                ? 'bg-[var(--primary)]/20 border-[var(--primary)] text-[var(--primary)]'
-                                                : 'bg-[#1a1b26] border-white/10 text-[var(--text-muted)] group-hover:border-white/30 group-hover:text-white'
-                                            }`}>
-                                            {isCompleted ? '✓' : idx + 1}
-                                        </div>
-                                        <span className={`absolute top-12 text-xs font-medium whitespace-nowrap transition-colors ${isActive ? 'text-white' : 'text-[var(--text-muted)] opacity-0 group-hover:opacity-100'}`}>
-                                            Chapter {idx + 1}
-                                        </span>
-                                    </button>
-                                );
-                            })}
+                <div className="p-4 border-t border-white/10 bg-white/[0.02]">
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-white/5 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-white/[0.02] mix-blend-overlay"></div>
+                        <div className="flex justify-between items-center mb-2 relative z-10">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white">Progress</span>
+                            <span className="text-[10px] font-black text-purple-400">{Math.round(((activeChapter) / course.chapters.length) * 100)}%</span>
                         </div>
+                        <div className="h-1.5 w-full bg-black/50 rounded-full overflow-hidden relative z-10">
+                            <div
+                                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
+                                style={{ width: `${((activeChapter) / course.chapters.length) * 100}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
 
-                        {/* Chapter Title & Tags */}
-                        <div className="animate-fade-in">
-                            <h2 className="text-4xl font-bold text-white mb-6 tracking-tight">{currentChapter.title}</h2>
+            {/* MAIN CONTENT AREA */}
+            <div className="flex-1 flex flex-col min-w-0 relative h-full">
+                {/* Top Bar */}
+                <header className="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-[#0a0a0a]/50 backdrop-blur-md z-10 sticky top-0">
+                    <div>
+                        <h2 className="text-xl font-black text-white flex items-center gap-3 tracking-tight">
+                            <span className="px-2 py-1 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] uppercase tracking-widest">Chapter {activeChapter + 1}</span>
+                            {currentChapter.title}
+                        </h2>
+                    </div>
+                    {/* Tabs Switcher */}
+                    <div className="flex gap-1 p-1 bg-[#0a0a0a] border border-white/10 rounded-xl">
+                        {[
+                            { id: 'watch', label: 'Watch', icon: '📺' },
+                            { id: 'read', label: 'Read', icon: '📄' },
+                            { id: 'practice', label: 'Practice', icon: '⚡' }
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === tab.id
+                                    ? 'bg-white text-black shadow-lg'
+                                    : 'text-gray-500 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                <span className={activeTab === tab.id ? 'text-black' : 'opacity-70'}>{tab.icon}</span>
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                </header>
 
-                            <div className="flex flex-wrap gap-2 mb-10">
-                                {currentChapter.topics?.map((topic, idx) => (
-                                    <span key={idx} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-xs font-medium text-[var(--text-secondary)] hover:bg-white/10 transition-colors cursor-default">
-                                        #{topic}
-                                    </span>
-                                ))}
-                            </div>
+                {/* Content Container */}
+                <div className="flex-1 overflow-y-auto relative scrollbar-thin scrollbar-thumb-white/10 bg-transparent">
+                    <div className="max-w-6xl mx-auto p-8 lg:p-12">
 
-                            {/* Cinema Video Player */}
-                            <div className="grid gap-8 mb-16">
-                                {currentChapter.videos?.map((video, idx) => (
-                                    <div key={idx} className="group relative rounded-3xl overflow-hidden bg-black border border-white/10 shadow-2xl shadow-black/50">
-                                        {/* Glow Effect */}
-                                        <div className="absolute -inset-1 bg-gradient-to-b from-[var(--primary)]/20 to-transparent opacity-20 blur-2xl group-hover:opacity-30 transition-opacity duration-500"></div>
-
-                                        <div className="relative aspect-video w-full bg-black">
-                                            {video.videoId ? (
-                                                <iframe
-                                                    width="100%"
-                                                    height="100%"
-                                                    src={`https://www.youtube.com/embed/${video.videoId}`}
-                                                    title={video.title}
-                                                    frameBorder="0"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                    allowFullScreen
-                                                    className="w-full h-full"
-                                                ></iframe>
-                                            ) : (
-                                                <div className="w-full h-full flex flex-col items-center justify-center bg-white/5 text-center p-8">
-                                                    <div className="text-5xl mb-4 opacity-50">🎥</div>
-                                                    <h3 className="text-white font-medium mb-2">{video.title}</h3>
-                                                    <p className="text-sm text-[var(--text-muted)] mb-6">Video unavailable directly</p>
-                                                    <a
-                                                        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(video.searchQuery || video.title)}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="px-6 py-3 bg-[var(--primary)] text-white rounded-xl text-sm font-medium hover:bg-[var(--primary)]/90 transition-all shadow-lg shadow-[var(--primary)]/20"
-                                                    >
-                                                        Search on YouTube ↗
-                                                    </a>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="relative p-6 bg-[#0a0a0a] border-t border-white/5">
-                                            <div className="flex justify-between items-start gap-4">
-                                                <div>
-                                                    <h3 className="text-lg font-bold text-white group-hover:text-[var(--primary)] transition-colors line-clamp-1 mb-1">{video.title}</h3>
-                                                    <p className="text-sm text-[var(--text-muted)] flex items-center gap-2">
-                                                        <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[10px]">▶</span>
-                                                        {video.creator} • {video.duration}
-                                                    </p>
-                                                </div>
-                                                {video.videoId && (
-                                                    <a
-                                                        href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="p-2.5 bg-white/5 rounded-xl hover:bg-white/10 text-[var(--text-muted)] hover:text-white transition-all hover:scale-105"
-                                                        title="Watch on YouTube"
-                                                    >
-                                                        ↗
-                                                    </a>
+                        {/* CONTENT: WATCH */}
+                        {activeTab === 'watch' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="grid gap-12">
+                                    {currentChapter.videos?.map((video, idx) => (
+                                        <div key={idx} className="group relative rounded-[2rem] overflow-hidden bg-[#0a0a0a] border border-white/10 shadow-2xl">
+                                            {/* Video Player */}
+                                            <div className="relative aspect-video w-full bg-black">
+                                                {video.videoId ? (
+                                                    <iframe
+                                                        width="100%"
+                                                        height="100%"
+                                                        src={`https://www.youtube.com/embed/${video.videoId}`}
+                                                        title={video.title}
+                                                        frameBorder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowFullScreen
+                                                        className="w-full h-full"
+                                                    ></iframe>
+                                                ) : (
+                                                    // Fallback UI
+                                                    <div className="w-full h-full flex flex-col items-center justify-center bg-[#151515] text-center p-8 relative overflow-hidden">
+                                                        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]"></div>
+                                                        <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 text-4xl grayscale opacity-30">
+                                                            🎥
+                                                        </div>
+                                                        <h3 className="text-white font-bold mb-2 text-lg">{video.title}</h3>
+                                                        <p className="text-xs text-gray-500 mb-8 uppercase tracking-widest font-bold">Preview unavailable externally</p>
+                                                        <a
+                                                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(video.searchQuery || video.title)}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="px-8 py-3 bg-white text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/10 relative z-10"
+                                                        >
+                                                            Watch on YouTube ↗
+                                                        </a>
+                                                    </div>
                                                 )}
                                             </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Flashcards (Bento Style) */}
-                            <div className="mb-16">
-                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                                    <span className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400">⚡</span>
-                                    Flashcards
-                                </h3>
-                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {currentChapter.flashcards?.map((card, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="group h-48 [perspective:1000px] cursor-pointer"
-                                        >
-                                            <div className="relative w-full h-full duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] transition-transform">
-                                                {/* Front */}
-                                                <div className="absolute inset-0 [backface-visibility:hidden] bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-lg group-hover:shadow-yellow-500/10 transition-all">
-                                                    <div className="text-3xl mb-3">❓</div>
-                                                    <h4 className="font-bold text-white text-lg">{card.front}</h4>
-                                                    <p className="text-xs text-[var(--text-muted)] mt-4 uppercase tracking-wider">Hover to reveal</p>
+                                            <div className="p-8 flex items-start justify-between gap-4 bg-white/[0.02]">
+                                                <div>
+                                                    <h3 className="text-2xl font-black text-white mb-2 leading-tight">{video.title}</h3>
+                                                    <p className="text-sm font-medium text-gray-500">{video.creator} • {video.duration}</p>
                                                 </div>
+                                                <button className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-colors">
+                                                    Share
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
 
-                                                {/* Back */}
-                                                <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-[var(--primary)]/20 to-purple-600/20 border border-[var(--primary)]/30 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-xl backdrop-blur-sm">
-                                                    <div className="text-3xl mb-3">💡</div>
-                                                    <p className="text-white font-medium text-sm leading-relaxed">{card.back}</p>
+                                <div className="mt-12 flex justify-end">
+                                    <button
+                                        onClick={() => setActiveTab('read')}
+                                        className="group px-8 py-4 bg-white text-black rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl shadow-white/10"
+                                    >
+                                        Next: Read Summary <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* CONTENT: READ */}
+                        {activeTab === 'read' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="grid md:grid-cols-2 gap-6 mb-12">
+                                    {/* Flashcards */}
+                                    {currentChapter.flashcards?.map((card, idx) => (
+                                        <div key={idx} className="group h-64 [perspective:1000px] cursor-pointer">
+                                            <div className="relative w-full h-full duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] transition-all ease-out">
+                                                <div className="absolute inset-0 [backface-visibility:hidden] bg-[#0a0a0a]/80 backdrop-blur-md border border-white/10 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center shadow-2xl hover:border-white/20 transition-colors">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 mb-4">Concept</span>
+                                                    <h4 className="font-black text-white text-xl leading-snug">{card.front}</h4>
+                                                </div>
+                                                <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-indigo-900/20 backdrop-blur-md border border-indigo-500/30 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center shadow-2xl overflow-y-auto">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-4">Explanation</span>
+                                                    <p className="text-indigo-100 font-medium text-sm leading-relaxed">{card.back}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+
+                                <div className="bg-[#0a0a0a]/60 backdrop-blur-md p-10 rounded-[2.5rem] border border-white/10 shadow-2xl">
+                                    <h3 className="text-xl font-black text-white mb-6 uppercase tracking-wide flex items-center gap-3">
+                                        <span className="w-8 h-1 bg-purple-500 rounded-full"></span>
+                                        Key Takeaways
+                                    </h3>
+                                    <ul className="grid gap-4">
+                                        {currentChapter.topics?.map((t, i) => (
+                                            <li key={i} className="flex gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors">
+                                                <span className="font-black text-purple-500 opacity-50">0{i + 1}</span>
+                                                <span className="font-medium text-gray-300 leading-relaxed">{t}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="mt-12 flex justify-end">
+                                    <button
+                                        onClick={() => setActiveTab('practice')}
+                                        className="group px-8 py-4 bg-white text-black rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl shadow-white/10"
+                                    >
+                                        Next: Practice Quiz <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                                    </button>
+                                </div>
                             </div>
+                        )}
 
-                            {/* Quiz Challenge Card */}
-                            <div className="relative rounded-3xl p-[1px] bg-gradient-to-br from-[var(--primary)]/50 to-purple-600/50">
-                                <div className="bg-[#0a0a0a] rounded-[23px] p-8 relative overflow-hidden">
-                                    {/* Background Decor */}
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--primary)]/10 rounded-full blur-[80px] pointer-events-none"></div>
+                        {/* CONTENT: PRACTICE */}
+                        {activeTab === 'practice' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto">
+                                <div className="bg-[#0a0a0a]/80 backdrop-blur-xl rounded-[2.5rem] p-12 border border-white/10 shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-                                    <div className="flex justify-between items-center mb-8 relative z-10">
-                                        <div>
-                                            <h3 className="text-2xl font-bold text-white mb-1">Knowledge Check</h3>
-                                            <p className="text-sm text-[var(--text-muted)]">Prove your mastery of this chapter</p>
-                                        </div>
-                                        {!quizMode && !showResults && (
+                                    {!quizMode && !showResults ? (
+                                        <div className="text-center py-10 relative z-10">
+                                            <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-2xl">⚡</div>
+                                            <h3 className="text-3xl font-black text-white mb-3 tracking-tight">Knowledge Check</h3>
+                                            <p className="text-gray-400 mb-10 font-medium">Verify your understanding of Chapter {activeChapter + 1}.</p>
                                             <button
                                                 onClick={() => setQuizMode(true)}
-                                                className="px-8 py-3 bg-[var(--primary)] text-white rounded-xl font-bold hover:bg-[var(--primary)]/90 transition-all shadow-lg shadow-[var(--primary)]/25 hover:scale-105 active:scale-95"
+                                                className="px-10 py-5 bg-white text-black rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]"
                                             >
                                                 Start Quiz
                                             </button>
-                                        )}
-                                    </div>
-
-                                    {quizMode && !showResults && (
-                                        <div className="space-y-8 animate-fade-in relative z-10">
-                                            {currentChapter.quiz?.map((q, idx) => (
-                                                <div key={idx} className="bg-white/5 rounded-2xl p-6 border border-white/5">
-                                                    <p className="text-white font-medium text-lg mb-6 flex gap-3">
-                                                        <span className="text-[var(--primary)] font-bold">{idx + 1}.</span>
-                                                        {q.question}
-                                                    </p>
-                                                    <div className="grid gap-3">
-                                                        {q.options?.map((option, optIdx) => (
-                                                            <button
-                                                                key={optIdx}
-                                                                onClick={() => handleQuizAnswer(idx, option)}
-                                                                className={`w-full text-left p-4 rounded-xl text-sm font-medium transition-all border ${quizAnswers[idx] === option
-                                                                    ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
-                                                                    : 'bg-black/20 border-white/5 text-[var(--text-secondary)] hover:bg-white/5 hover:border-white/10'
-                                                                    }`}
-                                                            >
-                                                                {option}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            <div className="flex justify-end pt-4">
-                                                <button
-                                                    onClick={handleQuizSubmit}
-                                                    disabled={Object.keys(quizAnswers).length !== (currentChapter.quiz?.length || 0)}
-                                                    className="px-10 py-4 bg-gradient-to-r from-[var(--primary)] to-purple-600 text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-[var(--primary)]/20 hover:scale-105 active:scale-95"
-                                                >
-                                                    Submit Answers
-                                                </button>
-                                            </div>
                                         </div>
-                                    )}
-
-                                    {showResults && (
-                                        <div className="space-y-6 animate-fade-in relative z-10">
-                                            <div className="text-center mb-8">
-                                                <div className="inline-block p-4 rounded-full bg-green-500/10 mb-4 border border-green-500/20">
-                                                    <div className="text-4xl">🎉</div>
-                                                </div>
-                                                <h3 className="text-2xl font-bold text-white mb-2">Quiz Results</h3>
-                                                <p className="text-[var(--text-muted)]">
-                                                    You got <span className="text-white font-bold">{currentChapter.quiz.filter((q, i) => quizAnswers[i] === q.correctAnswer).length}</span> out of <span className="text-white font-bold">{currentChapter.quiz.length}</span> correct!
-                                                </p>
-                                            </div>
-
-                                            {currentChapter.quiz.map((q, idx) => {
-                                                const isCorrect = quizAnswers[idx] === q.correctAnswer;
-                                                return (
-                                                    <div key={idx} className={`rounded-2xl p-6 border ${isCorrect ? 'bg-green-500/5 border-green-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
-                                                        <p className="text-white font-medium text-lg mb-4 flex gap-3">
-                                                            <span className={`font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>{idx + 1}.</span>
-                                                            {q.question}
-                                                        </p>
-                                                        <div className="space-y-2 mb-4">
-                                                            {q.options.map((opt, optIdx) => {
-                                                                const isSelected = quizAnswers[idx] === opt;
-                                                                const isTheCorrectAnswer = opt === q.correctAnswer;
-                                                                let className = "w-full text-left p-3 rounded-lg text-sm border transition-all ";
-
-                                                                if (isTheCorrectAnswer) {
-                                                                    className += "bg-green-500/20 border-green-500/50 text-green-200 font-medium";
-                                                                } else if (isSelected && !isCorrect) {
-                                                                    className += "bg-red-500/20 border-red-500/50 text-red-200";
-                                                                } else {
-                                                                    className += "bg-black/20 border-white/5 text-[var(--text-muted)] opacity-50";
-                                                                }
-
-                                                                return (
-                                                                    <div key={optIdx} className={className}>
-                                                                        <div className="flex justify-between items-center">
-                                                                            <span>{opt}</span>
-                                                                            {isTheCorrectAnswer && <span>✓</span>}
-                                                                            {isSelected && !isCorrect && <span>✗</span>}
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                        {q.explanation && (
-                                                            <div className="text-sm text-[var(--text-muted)] bg-black/20 p-4 rounded-xl border border-white/5 flex gap-2 items-start">
-                                                                <span className="text-lg">💡</span>
-                                                                <div>
-                                                                    <span className="font-bold text-[var(--primary)] block mb-1">Explanation</span>
-                                                                    {q.explanation}
-                                                                </div>
+                                    ) : (
+                                        // Quiz Component Logic (Reused)
+                                        <div className="space-y-10 relative z-10">
+                                            {!showResults ? (
+                                                <>
+                                                    {currentChapter.quiz?.map((q, idx) => (
+                                                        <div key={idx} className="space-y-6">
+                                                            <h4 className="text-xl font-bold text-white leading-snug">
+                                                                <span className="text-purple-500 mr-2 opacity-50">0{idx + 1}.</span>{q.question}
+                                                            </h4>
+                                                            <div className="grid gap-3">
+                                                                {q.options?.map((option, optIdx) => (
+                                                                    <button
+                                                                        key={optIdx}
+                                                                        onClick={() => handleQuizAnswer(idx, option)}
+                                                                        className={`w-full text-left p-5 rounded-xl text-sm font-medium transition-all border relative overflow-hidden group ${quizAnswers[idx] === option
+                                                                            ? 'bg-purple-600 border-purple-500 text-white shadow-xl'
+                                                                            : 'bg-white/[0.02] border-white/5 text-gray-400 hover:bg-white/5 hover:border-white/10'
+                                                                            }`}
+                                                                    >
+                                                                        {quizAnswers[idx] === option && <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>}
+                                                                        <span className="relative z-10">{option}</span>
+                                                                    </button>
+                                                                ))}
                                                             </div>
-                                                        )}
+                                                        </div>
+                                                    ))}
+                                                    <div className="pt-8 border-t border-white/5">
+                                                        <button
+                                                            onClick={handleQuizSubmit}
+                                                            disabled={Object.keys(quizAnswers).length !== (currentChapter.quiz?.length || 0)}
+                                                            className="w-full py-5 bg-white text-black rounded-2xl font-black text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all shadow-xl"
+                                                        >
+                                                            Submit Answers
+                                                        </button>
                                                     </div>
-                                                );
-                                            })}
+                                                </>
+                                            ) : (
+                                                <div className="text-center py-12">
+                                                    <div className="w-24 h-24 bg-emerald-500/10 border border-emerald-500/20 rounded-[2rem] flex items-center justify-center text-5xl mx-auto mb-8 shadow-2xl">🏆</div>
+                                                    <h3 className="text-3xl font-black text-white mb-2 tracking-tight">Quiz Complete!</h3>
+                                                    <p className="text-gray-400 mb-10 font-bold uppercase tracking-wide">
+                                                        Score: <span className="text-emerald-400">{currentChapter.quiz.filter((q, i) => quizAnswers[i] === q.correctAnswer).length}</span> / {currentChapter.quiz.length}
+                                                    </p>
 
-                                            <div className="flex justify-center pt-8">
-                                                <button
-                                                    onClick={handleCompleteChapter}
-                                                    className="px-10 py-4 bg-white text-black rounded-xl font-bold hover:bg-gray-100 transition-all shadow-xl hover:scale-105 active:scale-95"
-                                                >
-                                                    {activeChapter < (course.chapters?.length || 0) - 1 ? 'Next Chapter →' : 'Finish Course 🏆'}
-                                                </button>
-                                            </div>
+                                                    <div className="flex justify-center">
+                                                        <button
+                                                            onClick={handleCompleteChapter}
+                                                            className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-purple-500/20"
+                                                        >
+                                                            {activeChapter < (course.chapters?.length || 0) - 1 ? 'Next Chapter →' : 'Finish Course 🎓'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
+            </div>
 
-                {/* Right: Panels (Mentor, Reader, Playground) */}
-                <div className={`${showMentor || activeDoc ? 'w-[450px] opacity-100' : 'w-0 opacity-0'} shrink-0 h-full bg-[#0a0a0a]/95 backdrop-blur-2xl border-l border-white/10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-2xl z-40 overflow-hidden`}>
-                    {activeDoc ? (
-                        // Reader Panel
-                        <div className="h-full flex flex-col w-[450px]">
-                            <div className="p-5 border-b border-white/10 flex justify-between items-center bg-white/5">
-                                <div className="flex items-center gap-3 overflow-hidden">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm">📄</div>
-                                    <h3 className="font-bold text-white text-sm truncate" title={activeDoc.title}>
-                                        {loadingDoc ? 'Loading...' : activeDoc.title || 'Document'}
-                                    </h3>
-                                </div>
-                                <div className="flex gap-2">
-                                    <a href={activeDoc.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-white/10 rounded-lg text-[var(--text-muted)] hover:text-white transition-colors" title="Open in new tab">↗</a>
-                                    <button onClick={() => setActiveDoc(null)} className="p-2 hover:bg-white/10 rounded-lg text-[var(--text-muted)] hover:text-white transition-colors">✕</button>
-                                </div>
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/10">
-                                {loadingDoc ? (
-                                    <div className="flex flex-col items-center justify-center h-full gap-4">
-                                        <div className="w-10 h-10 border-3 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
-                                        <p className="text-sm text-[var(--text-muted)]">Fetching content...</p>
-                                    </div>
-                                ) : activeDoc.content ? (
-                                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-a:text-[var(--primary)] prose-strong:text-white prose-code:bg-white/10 prose-code:px-1 prose-code:rounded prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10">
-                                        <div dangerouslySetInnerHTML={{ __html: activeDoc.content }} />
-                                    </div>
-                                ) : (
-                                    <div className="text-center text-[var(--text-muted)] py-12">
-                                        Failed to load content.
-                                    </div>
-                                )}
-                            </div>
-                            {/* Mini Mentor Toggle when Reader is open */}
-                            {!showMentor && (
-                                <button
-                                    onClick={() => setShowMentor(true)}
-                                    className="absolute bottom-8 right-8 w-14 h-14 bg-[var(--primary)] rounded-full flex items-center justify-center text-white shadow-xl shadow-[var(--primary)]/30 hover:scale-110 transition-transform z-50 border-2 border-white/10"
-                                    title="Ask AI about this"
-                                >
-                                    <span className="text-2xl">🤖</span>
-                                </button>
-                            )}
+            {/* MENTOR FAB (Floating Action Button) */}
+            <button
+                onClick={() => setShowMentor(!showMentor)}
+                className="fixed bottom-8 right-8 w-16 h-16 bg-white text-black rounded-full shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center justify-center text-3xl hover:scale-110 transition-transform z-50 hover:bg-gray-100"
+                title="Ask AI Mentor"
+            >
+                ✨
+            </button>
+
+            {/* SLIDE-OVER PANELS (Mentor/Reader) */}
+            <div className={`fixed inset-y-0 right-0 w-[450px] bg-[#0a0a0a]/95 backdrop-blur-2xl border-l border-white/10 shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] z-50 ${showMentor || activeDoc ? 'translate-x-0' : 'translate-x-full'}`}>
+                {activeDoc ? (
+                    <div className="h-full flex flex-col">
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+                            <h3 className="font-black text-white text-sm truncate max-w-[200px] uppercase tracking-wide">{activeDoc.title || 'Document'}</h3>
+                            <button onClick={() => setActiveDoc(null)} className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors">✕</button>
                         </div>
-                    ) : (
-                        // Mentor Panel
-                        <div className="h-full w-[450px]">
+                        <div className="flex-1 overflow-y-auto p-8 prose prose-invert prose-sm">
+                            {loadingDoc ? <p className="text-center text-gray-500 font-bold animate-pulse">Loading Content...</p> : <div dangerouslySetInnerHTML={{ __html: activeDoc.content }} />}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="h-full flex flex-col">
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+                            <h3 className="font-black text-white text-sm uppercase tracking-wide flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                AI Mentor
+                            </h3>
+                            <button onClick={() => setShowMentor(false)} className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors">✕</button>
+                        </div>
+                        <div className="flex-1">
                             <MentorChat
                                 topic={course.topic}
                                 chapter={currentChapter}
@@ -521,8 +543,8 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
                                 onClose={() => setShowMentor(false)}
                             />
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

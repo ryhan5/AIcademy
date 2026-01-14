@@ -17,12 +17,10 @@ export default function Header() {
         };
         window.addEventListener('scroll', handleScroll);
 
-        // Check verification status
         const checkVerification = () => {
             setVerified(isUserVerified());
         };
         checkVerification();
-        // Poll for changes (simple way to keep sync without context)
         const interval = setInterval(checkVerification, 2000);
 
         return () => {
@@ -34,81 +32,84 @@ export default function Header() {
     const navItems = [
         { name: 'Roadmap', path: '/roadmap' },
         { name: 'Courses', path: '/course' },
+        { name: 'Jobs', path: '/jobs' },
         { name: 'Quiz', path: '/quiz' },
         { name: 'Interview', path: '/interview' },
         { name: 'Dashboard', path: '/dashboard' },
     ];
 
     return (
-        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
-            <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                <div className={`glass-panel rounded-full px-6 py-3 flex items-center justify-between border border-white/10 transition-all duration-300 ${scrolled ? 'bg-black/40 backdrop-blur-xl shadow-lg' : 'bg-transparent border-transparent'}`}>
+        <header
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${scrolled
+                ? 'bg-[#050505]/80 backdrop-blur-md border-b border-transparent py-4'
+                : 'bg-transparent border-b border-transparent py-8'
+                }`}
+        >
+            <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
 
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <span className="font-black text-2xl text-white tracking-tighter group-hover:text-[var(--primary)] transition-colors duration-300">
-                            AIcademy.
-                        </span>
-                    </Link>
+                {/* Logo: Clean & Bold */}
+                <Link href="/" className="group relative z-10">
+                    <span className="font-black text-2xl text-white tracking-tighter group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all duration-300">
+                        AIcademy
+                        <span className="text-purple-500 group-hover:text-white transition-colors">.</span>
+                    </span>
+                </Link>
 
-                    {/* Navigation */}
-                    <nav className="hidden md:flex items-center gap-1">
-                        {navItems.map((item) => {
-                            const isActive = pathname === item.path;
-                            return (
-                                <Link
-                                    key={item.path}
-                                    href={item.path}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden group ${isActive
-                                        ? 'text-white bg-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)]'
-                                        : 'text-[var(--text-muted)] hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    <span className="relative z-10">{item.name}</span>
-                                    {isActive && (
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/20 to-[var(--accent)]/20 blur-sm"></div>
-                                    )}
-                                </Link>
-                            );
-                        })}
-                    </nav>
+                {/* Navigation: Minimal Text */}
+                <nav className="hidden md:flex items-center gap-8 relative z-10">
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.path;
+                        return (
+                            <Link
+                                key={item.path}
+                                href={item.path}
+                                className={`text-sm font-bold tracking-wide transition-colors duration-300 relative group/link ${isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+                                    }`}
+                            >
+                                {item.name}
+                                {isActive && (
+                                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
+                                )}
+                            </Link>
+                        );
+                    })}
+                </nav>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-4">
-                        {status === 'authenticated' ? (
-                            <div className="flex items-center gap-3">
-                                <Link
-                                    href="/dashboard"
-                                    className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 group relative"
-                                >
-                                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] flex items-center justify-center text-[10px] font-bold text-white">
-                                        {session.user.name ? session.user.name[0].toUpperCase() : 'U'}
-                                    </div>
-                                    <span className="text-sm font-medium text-white group-hover:text-[var(--primary)] transition-colors">
-                                        {session.user.name || 'Profile'}
-                                    </span>
-                                    {verified && (
-                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] text-white border border-black shadow-lg animate-pulse-slow" title="Verified Developer">
-                                            ✓
-                                        </div>
-                                    )}
-                                </Link>
-                                <button
-                                    onClick={() => signOut()}
-                                    className="text-sm text-[var(--text-muted)] hover:text-white transition-colors"
-                                >
-                                    Sign Out
-                                </button>
-                            </div>
-                        ) : (
+                {/* Actions: Refined */}
+                <div className="flex items-center gap-6 relative z-10">
+                    {status === 'authenticated' ? (
+                        <div className="flex items-center gap-4">
+                            <Link
+                                href="/dashboard"
+                                className="hidden sm:flex items-center gap-3 group"
+                            >
+                                <div className={`flex items-center justify-center w-8 h-8 rounded-full border bg-white/5 text-white text-[10px] font-black transition-all duration-300 ${verified ? 'border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'border-white/10 group-hover:border-white/30'}`}>
+                                    {session.user.name ? session.user.name[0].toUpperCase() : 'U'}
+                                </div>
+                            </Link>
+                            <button
+                                onClick={() => signOut()}
+                                className="text-gray-500 hover:text-white transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-4">
                             <Link
                                 href="/login"
-                                className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-all"
+                                className="text-sm font-bold text-gray-400 hover:text-white transition-colors"
                             >
-                                Sign In
+                                Login
                             </Link>
-                        )}
-                    </div>
+                            <Link
+                                href="/register"
+                                className="pl-4 border-l border-white/10 text-sm font-bold text-white hover:text-purple-400 transition-colors"
+                            >
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

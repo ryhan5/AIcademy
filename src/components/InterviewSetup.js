@@ -14,78 +14,79 @@ export default function InterviewSetup({ onStart }) {
     };
 
     return (
-        <div className="bg-[#0a0a0a]/40 backdrop-blur-xl p-8 sm:p-12 rounded-[2.5rem] max-w-2xl w-full animate-fade-in border border-white/5 shadow-2xl relative overflow-hidden group">
-            {/* Decorative Gradient Line */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--secondary)]"></div>
+        <div className="w-full min-h-screen flex items-center justify-center p-4">
+            <div className="relative w-full max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-500">
+                {/* Background Glow */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-2xl opacity-50"></div>
 
-            {/* Ambient Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--primary)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-[var(--primary)]/20 transition-colors duration-500"></div>
+                <div className="relative bg-[#0a0a0a]/90 border border-white/10 p-8 sm:p-12 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl overflow-hidden">
+                    {/* Top Gradient Line */}
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 opacity-50"></div>
 
-            <div className="text-center mb-10 relative z-10">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/5 border border-white/10 mb-6 text-4xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    🎙️
-                </div>
-                <h2 className="text-4xl font-black mb-4 text-white tracking-tight">Mock Interview</h2>
-                <p className="text-lg text-[var(--text-muted)]">
-                    Practice technical questions tailored to your target role and experience.
-                </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-                {/* Role Input */}
-                <div className="space-y-3">
-                    <label className="block text-xs font-bold text-[var(--text-muted)] ml-1 uppercase tracking-wider">Target Role</label>
-                    <input
-                        type="text"
-                        value={role}
-                        onChange={(e) => setRole(e.target.value)}
-                        placeholder="e.g., Frontend Developer, DevOps Engineer..."
-                        className="w-full p-5 bg-black/20 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:border-[var(--primary)] focus:bg-black/30 transition-all text-lg shadow-inner"
-                        required
-                    />
-                </div>
-
-                {/* Experience Level */}
-                <div className="space-y-3">
-                    <label className="block text-xs font-bold text-[var(--text-muted)] ml-1 uppercase tracking-wider">Experience Level</label>
-                    <div className="grid grid-cols-3 gap-4">
-                        {['Junior', 'Mid-Level', 'Senior'].map((level) => (
-                            <button
-                                key={level}
-                                type="button"
-                                onClick={() => setExperience(level)}
-                                className={`p-4 rounded-2xl border transition-all text-center relative overflow-hidden group/btn ${experience === level
-                                    ? 'border-[var(--primary)] bg-[var(--primary)]/10 shadow-[0_0_20px_rgba(124,58,237,0.2)]'
-                                    : 'border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20'
-                                    }`}
-                            >
-                                <div className={`font-bold relative z-10 ${experience === level ? 'text-white' : 'text-[var(--text-muted)] group-hover/btn:text-white'}`}>{level}</div>
-                                {experience === level && (
-                                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/20 to-transparent opacity-50"></div>
-                                )}
-                            </button>
-                        ))}
+                    <div className="text-center mb-10 relative z-10">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mb-6 text-3xl shadow-2xl">
+                            🎙️
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-black mb-3 text-white tracking-tight">Interview Simulator</h2>
+                        <p className="text-gray-500 font-medium">
+                            Configure your session for realistic AI-driven technical interviews.
+                        </p>
                     </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                        {/* Role Input */}
+                        <div className="space-y-3">
+                            <label className="block text-[10px] font-black text-white/40 ml-1 uppercase tracking-[0.2em]">Target Role</label>
+                            <input
+                                type="text"
+                                value={role}
+                                onChange={(e) => setRole(e.target.value)}
+                                placeholder="e.g. Senior Frontend Engineer"
+                                className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/20 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.07] transition-all text-lg font-medium"
+                                autoFocus
+                                required
+                            />
+                        </div>
+
+                        {/* Experience Level */}
+                        <div className="space-y-3">
+                            <label className="block text-[10px] font-black text-white/40 ml-1 uppercase tracking-[0.2em]">Experience Level</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {['Junior', 'Mid-Level', 'Senior'].map((level) => (
+                                    <button
+                                        key={level}
+                                        type="button"
+                                        onClick={() => setExperience(level)}
+                                        className={`p-4 rounded-2xl border transition-all text-center flex flex-col items-center gap-1 ${experience === level
+                                            ? 'border-purple-500/50 bg-purple-500/10 shadow-xl scale-[1.02] text-white'
+                                            : 'border-white/5 bg-white/5 hover:border-white/10 opacity-60 hover:opacity-100 text-gray-400 hover:text-white'
+                                            }`}
+                                    >
+                                        <div className={`w-2 h-2 rounded-full mb-2 ${experience === level ? 'bg-purple-500' : 'bg-white/20'}`}></div>
+                                        <span className="text-[11px] font-black uppercase tracking-widest">{level}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="pt-4 flex flex-col gap-4">
+                            <button
+                                type="submit"
+                                disabled={!role.trim()}
+                                className="group w-full py-5 bg-white text-black rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden disabled:opacity-50"
+                            >
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    START SESSION <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                                </span>
+                            </button>
+
+                            <Link href="/dashboard" className="text-center text-[10px] font-black text-gray-600 hover:text-white uppercase tracking-widest transition-colors">
+                                Cancel & Return to Dashboard
+                            </Link>
+                        </div>
+                    </form>
                 </div>
-
-                {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={!role.trim()}
-                    className="w-full py-5 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-2xl font-bold text-lg hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all relative overflow-hidden group/submit mt-4"
-                >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                        <span>Start Interview</span>
-                        <span className="group-hover/submit:translate-x-1 transition-transform">→</span>
-                    </span>
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/submit:translate-y-0 transition-transform duration-300"></div>
-                </button>
-            </form>
-
-            <div className="mt-8 text-center relative z-10">
-                <Link href="/dashboard" className="text-[var(--text-muted)] hover:text-white transition-colors flex items-center justify-center gap-2 text-sm font-medium">
-                    <span>←</span> Back to Dashboard
-                </Link>
             </div>
         </div>
     );

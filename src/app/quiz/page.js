@@ -25,152 +25,173 @@ export default function QuizPage() {
     };
 
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-[var(--bg-dark)]">
-            {/* Background Ambience */}
-            <div className="fixed inset-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-[var(--primary)] rounded-full blur-[180px] opacity-20 animate-pulse-slow"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-[var(--accent)] rounded-full blur-[180px] opacity-20 animate-pulse-slow delay-1000"></div>
+        <main className="min-h-screen relative overflow-hidden bg-[#030303] selection:bg-purple-500/30 font-inter flex flex-col items-center justify-center p-4">
+            {/* Premium Mesh Background */}
+            <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] right-[-10%] w-[70%] h-[70%] bg-fuchsia-600/10 rounded-full blur-[140px] animate-pulse-slow"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[70%] h-[70%] bg-blue-600/10 rounded-full blur-[140px] animate-pulse-slow delay-1000"></div>
+
+                {/* Visual Density Elements */}
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] contrast-150"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
             </div>
 
-            {step === 'goal' && (
-                <div className="glass-panel p-8 sm:p-14 rounded-[2.5rem] max-w-3xl w-full border border-white/10 shadow-2xl animate-fade-in relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--secondary)]"></div>
+            <div className="relative z-10 w-full max-w-4xl mx-auto">
+                {step === 'goal' && (
+                    <div className="relative w-full max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-500">
+                        {/* Background Glow */}
+                        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-2xl opacity-50"></div>
 
-                    <div className="text-center mb-12">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/5 border border-white/10 mb-8 shadow-lg transform hover:scale-110 transition-transform duration-500 group">
-                            <span className="text-4xl group-hover:rotate-12 transition-transform duration-300">🧠</span>
-                        </div>
-                        <h1 className="text-5xl sm:text-6xl font-black mb-6 tracking-tight text-white">
-                            Test Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-[var(--accent)]">Skills</span>
-                        </h1>
-                        <p className="text-xl text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
-                            Challenge yourself with AI-generated quizzes tailored to any topic. Get instant feedback and level up your knowledge.
-                        </p>
-                    </div>
-                    <GoalInput
-                        onSubmit={handleGoalSubmit}
-                        label="What do you want to master?"
-                        description='e.g., "React Hooks", "Python Basics", "System Design"'
-                        placeholder="Enter a topic..."
-                        buttonText="Start Challenge"
-                    />
-                    <div className="mt-8 text-center">
-                        <Link href="/dashboard" className="text-[var(--text-muted)] hover:text-white transition-colors flex items-center justify-center gap-2">
-                            <span>←</span> Back to Dashboard
-                        </Link>
-                    </div>
-                </div>
-            )}
+                        <div className="relative bg-[#0a0a0a]/90 border border-white/10 p-8 sm:p-12 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl overflow-hidden">
+                            {/* Top Gradient Line */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 opacity-50"></div>
 
-            {step === 'quiz' && <Quiz goal={userGoal} onComplete={handleQuizComplete} />}
+                            <div className="text-center mb-10 relative z-10">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mb-6 text-3xl shadow-2xl">
+                                    🧠
+                                </div>
+                                <h1 className="text-3xl sm:text-4xl font-black mb-3 text-white tracking-tight">
+                                    Knowledge Challenge
+                                </h1>
+                                <p className="text-gray-500 font-medium max-w-lg mx-auto">
+                                    Generate an AI-powered assessment to test your mastery of any technical topic.
+                                </p>
+                            </div>
 
-            {step === 'results' && quizResults && (
-                <div className="glass-panel p-8 sm:p-12 rounded-[2.5rem] max-w-5xl w-full animate-fade-in border border-white/10 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--secondary)]"></div>
+                            <GoalInput
+                                onSubmit={handleGoalSubmit}
+                                label="TARGET TOPIC"
+                                description='e.g., "React Hooks", "System Design", "Advanced Python"'
+                                placeholder="Enter a topic to master..."
+                                buttonText="GENERATE ASSESSMENT"
+                            />
 
-                    <div className="text-center mb-12">
-                        <div className="text-6xl mb-4 animate-bounce-slow">🎉</div>
-                        <h2 className="text-4xl sm:text-5xl font-black text-white mb-3">Quiz Complete!</h2>
-                        <p className="text-xl text-[var(--text-muted)]">Here&apos;s how you performed</p>
-                    </div>
-
-                    {/* Score Card Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                        {/* Score */}
-                        <div className="glass-card p-8 rounded-3xl text-center border border-white/5 relative overflow-hidden group hover:bg-white/5 transition-all">
-                            <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <p className="text-xs text-[var(--text-muted)] uppercase tracking-[0.2em] font-bold mb-3">Score</p>
-                            <p className="text-6xl font-black text-white">
-                                {quizResults.score}<span className="text-3xl text-[var(--text-muted)]">/{quizResults.total}</span>
-                            </p>
-                        </div>
-
-                        {/* Accuracy */}
-                        <div className="glass-card p-8 rounded-3xl text-center border border-white/5 relative overflow-hidden group hover:bg-white/5 transition-all">
-                            <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <p className="text-xs text-[var(--text-muted)] uppercase tracking-[0.2em] font-bold mb-3">Accuracy</p>
-                            <p className="text-6xl font-black text-[var(--accent)]">
-                                {Math.round((quizResults.score / quizResults.total) * 100)}<span className="text-3xl">%</span>
-                            </p>
-                        </div>
-
-                        {/* Level */}
-                        <div className="glass-card p-8 rounded-3xl text-center border border-white/5 relative overflow-hidden group hover:bg-white/5 transition-all">
-                            <div className="absolute inset-0 bg-gradient-to-br from-[var(--secondary)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <p className="text-xs text-[var(--text-muted)] uppercase tracking-[0.2em] font-bold mb-3">Level</p>
-                            <p className="text-4xl font-black text-white mt-2">
-                                {quizResults.level}
-                            </p>
+                            <div className="mt-8 text-center">
+                                <Link href="/dashboard" className="text-[10px] font-black text-gray-600 hover:text-white uppercase tracking-widest transition-colors">
+                                    Cancel & Return to Dashboard
+                                </Link>
+                            </div>
                         </div>
                     </div>
+                )}
 
-                    {/* Question Review */}
-                    <div className="space-y-6 mb-12">
-                        <h3 className="text-2xl font-bold text-white flex items-center gap-3 mb-6">
-                            <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">📋</span>
-                            Detailed Review
-                        </h3>
-                        {quizResults.details.map((item, index) => (
-                            <div
-                                key={index}
-                                className={`p-6 rounded-3xl border transition-all hover:shadow-lg ${item.isCorrect
-                                    ? 'border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10'
-                                    : 'border-red-500/20 bg-red-500/5 hover:bg-red-500/10'
-                                    }`}
-                            >
-                                <div className="flex items-start gap-5">
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${item.isCorrect ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                                        }`}>
-                                        {item.isCorrect ? '✓' : '✕'}
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="font-bold text-xl text-white mb-4 leading-snug">
-                                            <span className="text-[var(--text-muted)] mr-3 text-base font-normal">Q{index + 1}</span>
-                                            {item.question}
-                                        </p>
+                {step === 'quiz' && (
+                    <div className="animate-in fade-in zoom-in-95 duration-500">
+                        <Quiz goal={userGoal} onComplete={handleQuizComplete} />
+                    </div>
+                )}
 
-                                        <div className="grid md:grid-cols-2 gap-4 mb-5">
-                                            {!item.isCorrect && (
-                                                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20">
-                                                    <p className="text-xs text-red-300 uppercase font-bold mb-2 tracking-wider">Your Answer</p>
-                                                    <p className="text-red-100 font-medium text-lg">{item.userAnswer}</p>
-                                                </div>
-                                            )}
-                                            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                                                <p className="text-xs text-emerald-300 uppercase font-bold mb-2 tracking-wider">Correct Answer</p>
-                                                <p className="text-emerald-100 font-medium text-lg">{item.correctAnswer}</p>
-                                            </div>
-                                        </div>
+                {step === 'results' && quizResults && (
+                    <div className="relative w-full animate-in fade-in zoom-in-95 duration-500">
+                        {/* Background Glow */}
+                        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-2xl opacity-50"></div>
 
-                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/5">
-                                            <p className="text-base leading-relaxed text-[var(--text-muted)]">
-                                                <span className="font-bold text-[var(--primary)] mr-2">💡 Insight:</span>
-                                                {item.explanation || "Understanding this concept is key to mastering the topic."}
-                                            </p>
-                                        </div>
-                                    </div>
+                        <div className="relative bg-[#0a0a0a]/90 border border-white/10 p-8 sm:p-12 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 opacity-50"></div>
+
+                            <div className="text-center mb-12">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mb-6 text-3xl shadow-2xl">
+                                    🏆
+                                </div>
+                                <h2 className="text-4xl font-black text-white mb-2 tracking-tight">Assessment Complete</h2>
+                                <p className="text-gray-500 font-medium">Performance Analysis</p>
+                            </div>
+
+                            {/* Score Stats */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                                {/* Score */}
+                                <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center group hover:bg-white/[0.07] transition-colors">
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-2">Score</p>
+                                    <p className="text-4xl font-black text-white">
+                                        {quizResults.score}<span className="text-xl text-gray-600">/{quizResults.total}</span>
+                                    </p>
+                                </div>
+
+                                {/* Accuracy */}
+                                <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center group hover:bg-white/[0.07] transition-colors">
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-2">Accuracy</p>
+                                    <p className="text-4xl font-black text-emerald-400">
+                                        {Math.round((quizResults.score / quizResults.total) * 100)}<span className="text-xl">%</span>
+                                    </p>
+                                </div>
+
+                                {/* Level */}
+                                <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center group hover:bg-white/[0.07] transition-colors">
+                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-2">Rating</p>
+                                    <p className="text-3xl font-black text-purple-400 mt-1">
+                                        {quizResults.level}
+                                    </p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
 
-                    {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button
-                            onClick={handleRetake}
-                            className="px-8 py-4 rounded-2xl font-bold glass-card hover:bg-white/10 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 text-white"
-                        >
-                            <span>🔄</span> Retake Quiz
-                        </button>
-                        <Link
-                            href="/dashboard"
-                            className="px-8 py-4 rounded-2xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] text-white hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
-                        >
-                            <span>📊</span> Back to Dashboard
-                        </Link>
+                            {/* Question Review */}
+                            <div className="space-y-4 mb-12">
+                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 px-1">Detailed Breakdown</h3>
+                                {quizResults.details.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className={`p-6 rounded-2xl border transition-all ${item.isCorrect
+                                            ? 'border-emerald-500/20 bg-emerald-500/5'
+                                            : 'border-red-500/20 bg-red-500/5'
+                                            }`}
+                                    >
+                                        <div className="flex gap-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <p className="font-bold text-white text-lg leading-snug">
+                                                        <span className="text-gray-500 mr-3 text-sm font-black">0{index + 1}</span>
+                                                        {item.question}
+                                                    </p>
+                                                    <div className={`shrink-0 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${item.isCorrect ? 'border-emerald-500/20 text-emerald-400' : 'border-red-500/20 text-red-400'
+                                                        }`}>
+                                                        {item.isCorrect ? 'Correct' : 'Missed'}
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                                                    {!item.isCorrect && (
+                                                        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                                            <p className="text-[9px] text-red-300 uppercase font-black mb-1">Your Selection</p>
+                                                            <p className="text-red-100 font-medium text-sm">{item.userAnswer}</p>
+                                                        </div>
+                                                    )}
+                                                    <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                                        <p className="text-[9px] text-emerald-300 uppercase font-black mb-1">Correct Answer</p>
+                                                        <p className="text-emerald-100 font-medium text-sm">{item.correctAnswer}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4 pt-4 border-t border-white/5">
+                                                    <p className="text-sm text-gray-400 font-medium leading-relaxed">
+                                                        <span className="text-purple-400 font-bold mr-2">Insight:</span>
+                                                        {item.explanation || "Review the core concepts behind this question."}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8 border-t border-white/5">
+                                <button
+                                    onClick={handleRetake}
+                                    className="px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all hover:scale-105"
+                                >
+                                    Retry Assessment
+                                </button>
+                                <Link
+                                    href="/dashboard"
+                                    className="px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest bg-white text-black hover:bg-gray-100 transition-all hover:scale-105 shadow-xl"
+                                >
+                                    Return to Dashboard
+                                </Link>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </main>
     );
 }

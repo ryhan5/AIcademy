@@ -51,6 +51,32 @@ const UserSchema = new mongoose.Schema({
         type: [String],
         default: [],
     },
+    skills: {
+        type: [{
+            subject: String,
+            score: Number
+        }],
+        default: [
+            { subject: 'Frontend', score: 50 },
+            { subject: 'Backend', score: 30 },
+            { subject: 'Design', score: 20 },
+            { subject: 'DevOps', score: 10 },
+            { subject: 'AI/ML', score: 10 },
+            { subject: 'Mobile', score: 10 }
+        ]
+    },
+    portfolioProjects: {
+        type: [{
+            title: String,
+            desc: String,
+            tags: [String],
+            color: String,
+            unlockedAt: { type: Date, default: Date.now },
+            progress: { type: Number, default: 0 }, // 0 to 100
+            status: { type: String, default: 'active', enum: ['active', 'completed'] }
+        }],
+        default: []
+    },
     isVerified: {
         type: Boolean,
         default: false,

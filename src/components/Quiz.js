@@ -94,31 +94,34 @@ export default function Quiz({ goal, onComplete }) {
 
     if (loading) {
         return (
-            <div className="glass-panel p-12 rounded-3xl max-w-2xl w-full flex flex-col items-center justify-center animate-fade-in border border-white/10 shadow-2xl relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/5 to-[var(--secondary)]/5"></div>
-                <div className="relative w-24 h-24 mb-8">
-                    <div className="absolute inset-0 border-4 border-[var(--primary)]/30 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
-                    <div className="absolute inset-4 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin-reverse opacity-70"></div>
+            <div className="relative w-full max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-500">
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-2xl opacity-50"></div>
+                <div className="relative bg-[#0a0a0a]/90 border border-white/10 p-12 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    </div>
+                    <h3 className="text-xl font-black text-white mb-2 uppercase tracking-wide">Generating Assessment</h3>
+                    <p className="text-gray-500 font-medium">Crafting questions for {goal}...</p>
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-white">Generating Challenge</h3>
-                <p className="text-[var(--text-muted)] text-center text-lg">AI is crafting a custom quiz on <span className="text-[var(--primary)] font-semibold">{goal}</span>...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="glass-panel p-12 rounded-3xl max-w-2xl w-full text-center animate-fade-in border border-red-500/20 shadow-2xl bg-red-500/5">
-                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl border border-red-500/20">⚠️</div>
-                <h3 className="text-2xl font-bold text-white mb-2">Generation Failed</h3>
-                <p className="text-red-200/80 mb-8 max-w-md mx-auto">{error}</p>
-                <button
-                    onClick={() => window.location.reload()}
-                    className="px-8 py-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all font-bold text-white border border-white/10"
-                >
-                    Try Again
-                </button>
+            <div className="relative w-full max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-500">
+                <div className="relative bg-[#0a0a0a]/90 border border-red-500/20 p-12 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl text-center">
+                    <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl border border-red-500/20">⚠️</div>
+                    <h3 className="text-xl font-black text-white mb-2">Generation Failed</h3>
+                    <p className="text-gray-500 mb-8 max-w-md mx-auto">{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="px-8 py-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all font-black text-xs uppercase tracking-widest text-white border border-white/10"
+                    >
+                        Try Again
+                    </button>
+                </div>
             </div>
         );
     }
@@ -126,7 +129,7 @@ export default function Quiz({ goal, onComplete }) {
     if (questions.length === 0) return null;
 
     return (
-        <>
+        <div className="relative w-full max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-500">
             {xpNotification && (
                 <XPNotification
                     xp={xpNotification.xp}
@@ -135,58 +138,50 @@ export default function Quiz({ goal, onComplete }) {
                 />
             )}
 
-            <div className="glass-panel p-8 sm:p-12 rounded-3xl max-w-3xl w-full animate-fade-in border border-white/10 shadow-2xl relative overflow-hidden">
-                {/* Background Glow */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+            {/* Background Glow */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-2xl opacity-50"></div>
 
-                {/* Progress Bar */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-white/5">
-                    <div
-                        className="h-full bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--secondary)] transition-all duration-500 relative"
-                        style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-                    >
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
+            <div className="relative bg-[#0a0a0a]/90 border border-white/10 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl overflow-hidden flex flex-col min-h-[500px]">
+                {/* Top Gradient Line */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 opacity-50"></div>
+
+                <div className="p-8 pb-0">
+                    <div className="flex justify-between items-center mb-8">
+                        <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                                Question {currentQuestion + 1} / {questions.length}
+                            </span>
+                        </div>
+                        <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-indigo-500 transition-all duration-500 ease-out"
+                                style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+                            ></div>
+                        </div>
                     </div>
-                </div>
 
-                <div className="flex justify-between items-center mb-10 mt-4 relative z-10">
-                    <div className="flex items-center gap-4">
-                        <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">
-                            Question {currentQuestion + 1} / {questions.length}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs text-[var(--accent)] font-bold uppercase tracking-wider bg-[var(--accent)]/10 px-3 py-1.5 rounded-full border border-[var(--accent)]/20">
-                            <span>⚡</span> +{XP_REWARDS.QUIZ_QUESTION} XP
-                        </span>
-                    </div>
-                </div>
-
-                <div className="mb-12 relative z-10">
-                    <h3 className="text-2xl sm:text-4xl font-black leading-tight mb-8 text-white">
+                    <h3 className="text-2xl md:text-3xl font-black leading-tight text-white mb-8 min-h-[3rem]">
                         {questions[currentQuestion].question}
                     </h3>
+                </div>
 
-                    <div className="grid gap-4">
-                        {questions[currentQuestion].options.map((option, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleAnswer(option)}
-                                className="group relative p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-[var(--primary)]/50 transition-all duration-300 overflow-hidden"
-                            >
-                                <div className="flex items-center gap-5 relative z-10">
-                                    <div className="w-10 h-10 rounded-xl border border-white/10 bg-black/20 flex items-center justify-center text-sm font-bold text-[var(--text-muted)] group-hover:border-[var(--primary)] group-hover:text-[var(--primary)] group-hover:bg-[var(--primary)]/10 transition-all">
-                                        {String.fromCharCode(65 + index)}
-                                    </div>
-                                    <span className="text-lg font-medium text-white/90 group-hover:text-white transition-colors">
-                                        {option}
-                                    </span>
-                                </div>
-                                {/* Hover Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </button>
-                        ))}
-                    </div>
+                <div className="flex-1 p-8 pt-0 flex flex-col justify-end gap-3">
+                    {questions[currentQuestion].options.map((option, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleAnswer(option)}
+                            className="group relative p-5 text-left rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all duration-200 overflow-hidden flex items-center gap-4 active:scale-[0.99]"
+                        >
+                            <div className="w-8 h-8 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-xs font-black text-gray-500 group-hover:bg-white group-hover:text-black transition-colors">
+                                {String.fromCharCode(65 + index)}
+                            </div>
+                            <span className="text-base font-medium text-gray-300 group-hover:text-white transition-colors">
+                                {option}
+                            </span>
+                        </button>
+                    ))}
                 </div>
             </div>
-        </>
+        </div>
     );
 }

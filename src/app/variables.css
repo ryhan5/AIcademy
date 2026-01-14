@@ -20,9 +20,9 @@
   --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
 
   /* Backgrounds - Dark Theme Base */
-  --bg-h: 240;
-  --bg-s: 10%;
-  --bg-l: 10%;
+  --bg-h: 0;
+  --bg-s: 0%;
+  --bg-l: 1.2%; /* Matches #030303 */
   --bg-dark: hsl(var(--bg-h), var(--bg-s), var(--bg-l));
   --bg-card: hsl(var(--bg-h), var(--bg-s), 15%);
 

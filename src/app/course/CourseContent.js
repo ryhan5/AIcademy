@@ -51,33 +51,35 @@ export default function CourseContent() {
     };
 
     return (
-        <main className="h-[calc(100vh-6rem)] flex overflow-hidden bg-[#0a0a0a] text-white selection:bg-[var(--primary)]/30">
-            {/* Ambient Background */}
-            <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-[var(--primary)]/20 rounded-full blur-[120px] animate-pulse-slow mix-blend-screen"></div>
-                <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[100px] animate-pulse-slow delay-1000 mix-blend-screen"></div>
-                <div className="absolute top-[40%] left-[30%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[80px] animate-pulse-slow delay-2000 mix-blend-screen"></div>
-                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03]"></div>
+        <main className="h-[calc(100vh-6rem)] flex overflow-hidden bg-[#030303] text-white selection:bg-purple-500/30 relative font-inter">
+            {/* Premium Mesh Background */}
+            <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] right-[-10%] w-[70%] h-[70%] bg-fuchsia-600/10 rounded-full blur-[140px] animate-pulse-slow"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[70%] h-[70%] bg-blue-600/10 rounded-full blur-[140px] animate-pulse-slow delay-1000"></div>
+
+                {/* Visual Density Elements */}
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] contrast-150"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
             </div>
 
             {/* Sidebar */}
-            <div className={`${showSidebar ? 'w-80 opacity-100' : 'w-0 opacity-0'} shrink-0 bg-black/40 backdrop-blur-xl border-r border-white/5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col relative z-20 overflow-hidden`}>
-                <div className="p-6 border-b border-white/5 flex items-center justify-between shrink-0">
+            <div className={`${showSidebar ? 'w-80 opacity-100' : 'w-0 opacity-0'} shrink-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-r border-white/10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col relative z-20 overflow-hidden shadow-2xl`}>
+                <div className="p-6 border-b border-white/10 flex items-center justify-between shrink-0 bg-white/[0.02]">
                     <div>
-                        <h2 className="font-bold text-lg tracking-tight">Your Learning</h2>
-                        <p className="text-xs text-[var(--text-muted)]">History & Progress</p>
+                        <h2 className="font-black text-lg tracking-tight text-white">Your Learning</h2>
+                        <p className="text-[10px] uppercase tracking-widest font-bold text-gray-500">History & Progress</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setStep('input')}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/5 transition-all hover:scale-105 active:scale-95"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 active:scale-95 text-gray-400 hover:text-white"
                             title="New Course"
                         >
-                            <span className="text-lg leading-none mb-0.5">+</span>
+                            <span className="text-xl leading-none mb-0.5">+</span>
                         </button>
                         <button
                             onClick={() => setShowSidebar(false)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/5 transition-all hover:scale-105 active:scale-95 md:hidden"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 active:scale-95 md:hidden text-gray-400"
                             title="Close Sidebar"
                         >
                             ✕
@@ -87,31 +89,33 @@ export default function CourseContent() {
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {loadingHistory ? (
-                        <div className="flex flex-col gap-2 animate-pulse">
+                        <div className="flex flex-col gap-3 animate-pulse">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="h-16 bg-white/5 rounded-xl"></div>
+                                <div key={i} className="h-16 bg-white/5 rounded-2xl border border-white/5"></div>
                             ))}
                         </div>
                     ) : history.length === 0 ? (
-                        <div className="text-center text-[var(--text-muted)] py-8 text-sm border border-dashed border-white/10 rounded-xl">
-                            No courses yet. <br /> Start your first journey!
+                        <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+                            <span className="text-2xl mb-2 grayscale opacity-30">📚</span>
+                            <p className="text-xs text-gray-500 font-medium">No courses yet.<br />Start your first journey!</p>
                         </div>
                     ) : (
                         history.map((course) => (
                             <button
                                 key={course._id}
                                 onClick={() => loadCourse(course)}
-                                className={`group w-full text-left p-4 rounded-xl transition-all duration-300 border ${courseData?._id === course._id
-                                    ? 'bg-[var(--primary)]/10 border-[var(--primary)]/30 shadow-[0_0_20px_-5px_var(--primary)]'
+                                className={`group w-full text-left p-4 rounded-2xl transition-all duration-300 border relative overflow-hidden ${courseData?._id === course._id
+                                    ? 'bg-indigo-600/10 border-indigo-500/30'
                                     : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                                     }`}
                             >
-                                <div className={`font-medium truncate mb-1 transition-colors ${courseData?._id === course._id ? 'text-[var(--primary)]' : 'text-white group-hover:text-white'}`}>
+                                {courseData?._id === course._id && <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500"></div>}
+                                <div className={`font-bold truncate mb-1 text-sm transition-colors ${courseData?._id === course._id ? 'text-indigo-300' : 'text-gray-300 group-hover:text-white'}`}>
                                     {course.title}
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+                                <div className="flex items-center justify-between text-[10px] font-medium text-gray-500 uppercase tracking-wide">
                                     <span>{new Date(course.createdAt).toLocaleDateString()}</span>
-                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">Resume →</span>
                                 </div>
                             </button>
                         ))
@@ -119,12 +123,12 @@ export default function CourseContent() {
                 </div>
 
                 {/* Sidebar Footer */}
-                <div className="p-4 border-t border-white/5">
-                    <Link href="/dashboard" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 text-[var(--text-muted)] hover:text-white transition-all group">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="p-4 border-t border-white/10 bg-white/[0.02]">
+                    <Link href="/dashboard" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all group border border-transparent hover:border-white/5">
+                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform text-sm font-black text-gray-500 group-hover:text-white">
                             ←
                         </div>
-                        <span className="font-medium text-sm">Back to Dashboard</span>
+                        <span className="font-bold text-xs uppercase tracking-wide">Back to Dashboard</span>
                     </Link>
                 </div>
             </div>
@@ -134,7 +138,7 @@ export default function CourseContent() {
                 {/* Toggle Sidebar Button (Floating) */}
                 <button
                     onClick={() => setShowSidebar(!showSidebar)}
-                    className={`absolute top-6 left-6 z-50 w-10 h-10 flex items-center justify-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/10 transition-all hover:scale-105 active:scale-95 ${showSidebar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    className={`absolute top-6 left-6 z-50 w-10 h-10 flex items-center justify-center bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 rounded-xl text-white hover:bg-white/10 transition-all hover:scale-105 active:scale-95 shadow-xl ${showSidebar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                 >
                     →
                 </button>

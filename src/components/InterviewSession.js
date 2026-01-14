@@ -35,7 +35,7 @@ export default function InterviewSession({ setupData, onEnd }) {
                 setPermissionError(null);
             } catch (err) {
                 console.error("Error accessing webcam:", err);
-                setPermissionError("Camera access denied. Please enable camera permissions.");
+                setPermissionError("Camera access denied.");
             }
         };
         startCamera();
@@ -52,22 +52,17 @@ export default function InterviewSession({ setupData, onEnd }) {
         if (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = true; // Keep listening
-            recognitionRef.current.interimResults = true; // Show real-time results
+            recognitionRef.current.continuous = true;
+            recognitionRef.current.interimResults = true;
             recognitionRef.current.lang = 'en-US';
 
             recognitionRef.current.onresult = (event) => {
                 let finalTranscript = '';
-                let interimTranscript = '';
-
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
                     }
                 }
-
                 if (finalTranscript) {
                     setInput(prev => prev + (prev ? ' ' : '') + finalTranscript);
                 }
@@ -76,15 +71,7 @@ export default function InterviewSession({ setupData, onEnd }) {
             recognitionRef.current.onerror = (event) => {
                 console.error('Speech recognition error', event.error);
                 if (event.error === 'not-allowed') {
-                    setPermissionError("Microphone access denied. Please enable microphone permissions in your browser settings.");
-                    setIsListening(false);
-                }
-            };
-
-            recognitionRef.current.onend = () => {
-                if (isListening) {
-                    // recognitionRef.current.start(); 
-                } else {
+                    setPermissionError("Microphone access denied.");
                     setIsListening(false);
                 }
             };
@@ -95,18 +82,12 @@ export default function InterviewSession({ setupData, onEnd }) {
         if (typeof window !== 'undefined' && window.speechSynthesis) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-
             const voices = window.speechSynthesis.getVoices();
             const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha'));
             if (preferredVoice) utterance.voice = preferredVoice;
-
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-
             utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => setIsSpeaking(false);
             utterance.onerror = () => setIsSpeaking(false);
-
             window.speechSynthesis.speak(utterance);
         }
     };
@@ -203,7 +184,6 @@ export default function InterviewSession({ setupData, onEnd }) {
             setFeedback(data);
         } catch (error) {
             console.error('Failed to generate feedback:', error);
-            // Fallback or error state could be handled here
         } finally {
             setGeneratingFeedback(false);
         }
@@ -211,220 +191,205 @@ export default function InterviewSession({ setupData, onEnd }) {
 
     if (feedback) {
         return (
-            <div className="bg-[#0a0a0a]/40 backdrop-blur-xl rounded-[2.5rem] max-w-4xl w-full p-8 border border-white/5 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
-                <div className="text-center mb-8">
-                    <div className="inline-block p-4 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] mb-4 shadow-lg">
-                        <span className="text-4xl">📊</span>
+            <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-[2.5rem] max-w-5xl w-full p-8 md:p-12 border border-white/10 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-10 border-b border-white/5 pb-8">
+                    <div>
+                        <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3">
+                            Session Complete
+                        </div>
+                        <h2 className="text-4xl font-black text-white tracking-tight">Performance Report</h2>
+                        <p className="text-gray-500 mt-2 font-medium">{setupData.role} • {setupData.experience}</p>
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-2">Interview Analysis</h2>
-                    <p className="text-[var(--text-muted)]">Here&apos;s how you performed</p>
+
+                    <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-center min-w-[120px]">
+                        <div className="text-4xl font-black text-white tracking-tighter">{feedback.score}</div>
+                        <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Score</div>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="col-span-1 bg-white/5 rounded-3xl p-6 border border-white/5 flex flex-col items-center justify-center text-center">
-                        <div className="text-5xl font-bold text-[var(--accent)] mb-2">{feedback.score}</div>
-                        <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Overall Score</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <div className="col-span-full bg-white/5 rounded-2xl p-6 border border-white/10">
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Synopsis</h3>
+                        <p className="text-gray-300 leading-relaxed text-sm font-medium">{feedback.feedback}</p>
                     </div>
-                    <div className="col-span-2 bg-white/5 rounded-3xl p-6 border border-white/5">
-                        <h3 className="text-lg font-bold text-white mb-3">Summary</h3>
-                        <p className="text-[var(--text-muted)] leading-relaxed">{feedback.feedback}</p>
-                    </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-green-500/5 rounded-3xl p-6 border border-green-500/10">
-                        <h3 className="text-lg font-bold text-green-400 mb-4 flex items-center gap-2">
-                            <span>💪</span> Strengths
+                    <div>
+                        <h3 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            Standout Areas
                         </h3>
-                        <ul className="space-y-3">
+                        <div className="space-y-3">
                             {feedback.strengths.map((point, i) => (
-                                <li key={i} className="flex items-start gap-3 text-white/80">
-                                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0"></span>
+                                <div key={i} className="bg-white/5 border border-white/5 p-4 rounded-xl text-sm text-gray-300">
                                     {point}
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     </div>
-                    <div className="bg-orange-500/5 rounded-3xl p-6 border border-orange-500/10">
-                        <h3 className="text-lg font-bold text-orange-400 mb-4 flex items-center gap-2">
-                            <span>🎯</span> Areas for Improvement
+
+                    <div>
+                        <h3 className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            Growth Opportunities
                         </h3>
-                        <ul className="space-y-3">
+                        <div className="space-y-3">
                             {feedback.weaknesses.map((point, i) => (
-                                <li key={i} className="flex items-start gap-3 text-white/80">
-                                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 flex-shrink-0"></span>
+                                <div key={i} className="bg-white/5 border border-white/5 p-4 rounded-xl text-sm text-gray-300">
                                     {point}
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     </div>
                 </div>
 
-                <div className="bg-blue-500/5 rounded-3xl p-6 border border-blue-500/10 mb-8">
-                    <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center gap-2">
-                        <span>🚀</span> Action Plan
-                    </h3>
-                    <div className="space-y-4">
+                <div className="mb-10">
+                    <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">Recommended Action Plan</h3>
+                    <div className="space-y-2">
                         {feedback.improvement_plan.map((step, i) => (
-                            <div key={i} className="flex items-center gap-4 bg-black/20 p-4 rounded-2xl border border-white/5">
-                                <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">
-                                    {i + 1}
-                                </div>
-                                <p className="text-white/90">{step}</p>
+                            <div key={i} className="flex gap-4 p-4 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all text-sm text-gray-400 hover:text-gray-200">
+                                <span className="font-bold text-white/20">0{i + 1}</span>
+                                <span className="font-medium">{step}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <button
-                    onClick={onEnd}
-                    className="w-full py-4 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white rounded-2xl font-bold transition-all shadow-lg shadow-[var(--primary)]/20"
-                >
-                    Return to Dashboard
-                </button>
+                <div className="flex justify-end gap-4 border-t border-white/5 pt-8">
+                    <button onClick={onEnd} className="px-8 py-4 bg-white text-black rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform">
+                        Back to Dashboard
+                    </button>
+                </div>
             </div>
-        );
+        )
     }
 
     if (generatingFeedback) {
         return (
-            <div className="bg-[#0a0a0a]/40 backdrop-blur-xl rounded-[2.5rem] max-w-2xl w-full p-12 border border-white/5 shadow-2xl animate-fade-in flex flex-col items-center text-center">
-                <div className="w-20 h-20 rounded-full bg-[var(--primary)]/20 flex items-center justify-center mb-6 animate-pulse">
-                    <span className="text-4xl">🧠</span>
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Analyzing Interview...</h2>
-                <p className="text-[var(--text-muted)]">Our AI is reviewing your answers and generating a detailed report.</p>
+            <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-[2.5rem] p-16 border border-white/10 shadow-2xl flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 rounded-full border-4 border-white/10 border-t-white animate-spin mb-8"></div>
+                <h3 className="text-xl font-black text-white tracking-widest uppercase mb-2">Analyzing Session</h3>
+                <p className="text-gray-500 font-medium text-sm">Synthesizing performance metrics and feedback...</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-[#0a0a0a]/40 backdrop-blur-xl rounded-[2.5rem] max-w-6xl w-full h-[90vh] flex flex-col border border-white/5 shadow-2xl relative overflow-hidden animate-fade-in">
-            {/* Header & Avatar */}
-            <div className="p-6 border-b border-white/5 bg-black/20 flex justify-between items-center relative overflow-hidden">
-                <div className="flex items-center gap-6 relative z-10">
-                    <div className="relative">
-                        <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center text-3xl shadow-lg relative z-10 transition-transform ${isSpeaking ? 'scale-110' : 'scale-100'}`}>
-                            🤖
-                        </div>
-                        {isSpeaking && (
-                            <>
-                                <div className="absolute inset-0 rounded-full bg-[var(--primary)] opacity-50 animate-ping"></div>
-                                <div className="absolute inset-0 rounded-full bg-[var(--accent)] opacity-30 animate-ping delay-150"></div>
-                            </>
-                        )}
-                    </div>
-
+        <div className="bg-[#0a0a0a]/80 backdrop-blur-3xl rounded-[2.5rem] max-w-6xl w-full h-[85vh] flex flex-col border border-white/10 shadow-2xl relative overflow-hidden transition-all duration-500">
+            {/* Minimal Header */}
+            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                <div className="flex items-center gap-4">
+                    <div className={`w-3 h-3 rounded-full ${isSpeaking ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-500/20'}`}></div>
                     <div>
-                        <h3 className="font-bold text-white text-lg">AI Interviewer</h3>
-                        <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
-                            {isSpeaking ? (
-                                <span className="text-[var(--accent)] animate-pulse">● Speaking...</span>
-                            ) : (
-                                <span>{setupData.role} • {setupData.experience}</span>
-                            )}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Webcam Feed (Picture-in-Picture style) */}
-                <div className="relative w-48 h-36 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg bg-black/50">
-                    <video
-                        ref={videoRef}
-                        autoPlay
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover transform scale-x-[-1]" // Mirror effect
-                    />
-                    <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/60 px-2 py-1 rounded-md">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-[10px] font-bold text-white">YOU</span>
+                        <h3 className="font-bold text-white text-sm tracking-tight">AI Interviewer</h3>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{isSpeaking ? 'Speaking' : 'Listening'}</p>
                     </div>
                 </div>
 
                 <button
                     onClick={handleEndSession}
-                    className="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all text-sm font-bold ml-4"
+                    className="px-5 py-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 border border-red-500/10 transition-all font-black text-[10px] uppercase tracking-widest"
                 >
                     End Session
                 </button>
             </div>
 
-            {/* Permission Error Banner */}
-            {permissionError && (
-                <div className="bg-red-500/10 border-b border-red-500/20 p-4 flex items-center justify-between animate-fade-in">
-                    <div className="flex items-center gap-3 text-red-400">
-                        <span className="text-xl">⚠️</span>
-                        <p className="text-sm font-medium">{permissionError}</p>
+            {/* Main Content */}
+            <div className="flex-1 flex overflow-hidden">
+                {/* Clean Video Feed */}
+                <div className="hidden md:flex md:w-[35%] border-r border-white/5 p-6 flex-col justify-center bg-black/20">
+                    <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black/40 border border-white/10 relative shadow-2xl">
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover transform scale-x-[-1] opacity-70"
+                        />
+                        <div className="absolute top-4 left-4 flex gap-2">
+                            <div className="px-2 py-1 bg-black/50 backdrop-blur-md rounded-md border border-white/10 text-[9px] font-black text-white/60 uppercase tracking-widest">
+                                REC
+                            </div>
+                        </div>
                     </div>
-                    <button
-                        onClick={() => setPermissionError(null)}
-                        className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                        Dismiss
-                    </button>
-                </div>
-            )}
 
-            {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                {messages.map((msg, idx) => (
-                    <div
-                        key={idx}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                        <div
-                            className={`max-w-[80%] p-5 rounded-3xl text-lg leading-relaxed ${msg.role === 'user'
-                                ? 'bg-[var(--primary)] text-white rounded-tr-none shadow-[0_5px_15px_rgba(124,58,237,0.3)]'
-                                : 'bg-white/5 text-white/90 rounded-tl-none border border-white/5'
-                                }`}
-                        >
-                            {msg.content}
+                    <div className="mt-8 px-4">
+                        <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-4 text-center">Session Controls & Context</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+                                <div className="text-xl font-bold text-white mb-1">{setupData.experience}</div>
+                                <div className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Level</div>
+                            </div>
+                            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+                                <div className="text-xl font-bold text-white mb-1">{setupData.role}</div>
+                                <div className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Role</div>
+                            </div>
                         </div>
                     </div>
-                ))}
-                {loading && (
-                    <div className="flex justify-start">
-                        <div className="bg-white/5 px-6 py-4 rounded-3xl rounded-tl-none border border-white/5 flex gap-2 items-center">
-                            <div className="w-2 h-2 bg-[var(--text-muted)] rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-[var(--text-muted)] rounded-full animate-bounce delay-100"></div>
-                            <div className="w-2 h-2 bg-[var(--text-muted)] rounded-full animate-bounce delay-200"></div>
+                </div>
+
+                {/* Chat Area */}
+                <div className="flex-1 flex flex-col bg-transparent relative">
+                    <div className="flex-1 overflow-y-auto px-8 py-8 space-y-6 scrollbar-hide">
+                        <div className="flex justify-center mb-8">
+                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Session Started</span>
                         </div>
+
+                        {messages.map((msg, idx) => (
+                            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+                                <div className={`max-w-[85%] p-5 rounded-2xl text-sm leading-relaxed font-medium ${msg.role === 'user'
+                                    ? 'bg-white text-black rounded-br-sm shadow-xl'
+                                    : 'bg-white/5 text-gray-300 rounded-bl-sm border border-white/10'
+                                    }`}>
+                                    {msg.content}
+                                </div>
+                            </div>
+                        ))}
+
+                        {loading && (
+                            <div className="flex justify-start">
+                                <div className="bg-white/5 px-4 py-3 rounded-2xl rounded-bl-sm border border-white/5 flex gap-1.5 items-center">
+                                    <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce"></div>
+                                    <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                                    <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
                     </div>
-                )}
-                <div ref={messagesEndRef} />
+
+                    {/* Minimal Input Area */}
+                    <div className="p-6 bg-white/[0.02] border-t border-white/5">
+                        <form onSubmit={handleSend} className="relative flex gap-4">
+                            <button
+                                type="button"
+                                onClick={toggleListening}
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all border ${isListening
+                                    ? 'bg-red-500/20 text-red-500 border-red-500/30'
+                                    : 'bg-white/5 text-gray-400 border-white/5 hover:bg-white/10 hover:text-white'
+                                    }`}
+                            >
+                                {isListening ? '⏹️' : '🎤'}
+                            </button>
+
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder="Type your response..."
+                                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 text-white placeholder-gray-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all font-medium"
+                            />
+
+                            <button
+                                type="submit"
+                                disabled={!input.trim() || loading}
+                                className="px-6 rounded-xl bg-white text-black font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                            >
+                                Send
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
-
-            {/* Input Area */}
-            <form onSubmit={handleSend} className="p-6 border-t border-white/5 bg-black/20">
-                <div className="relative flex gap-4">
-                    <button
-                        type="button"
-                        onClick={toggleListening}
-                        className={`p-4 rounded-2xl transition-all ${isListening
-                            ? 'bg-red-500 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]'
-                            : 'bg-white/5 text-[var(--text-muted)] hover:bg-white/10 hover:text-white'
-                            }`}
-                        title="Toggle Microphone"
-                    >
-                        🎤
-                    </button>
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder={isListening ? "Listening..." : "Type your answer..."}
-                        className="flex-1 p-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:border-[var(--primary)] focus:bg-white/10 transition-all"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!input.trim() || loading}
-                        className="px-6 py-4 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white rounded-2xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[var(--primary)]/20"
-                    >
-                        Send
-                    </button>
-                </div>
-            </form>
         </div>
     );
 }

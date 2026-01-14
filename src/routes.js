@@ -5,6 +5,14 @@
  */
 export const publicRoutes = [
     "/",
+    "/roadmap",
+    "/dashboard",
+    "/course",
+    "/interview",
+    "/api/generate-roadmap",
+    "/api/generate-project-blueprint",
+    "/api/interview",
+    "/api/interview-feedback",
 ];
 
 /**

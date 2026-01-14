@@ -1,68 +1,19 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
-import ReactFlow, {
-    Background,
-    Controls,
-    MiniMap,
-    useNodesState,
-    useEdgesState,
-    MarkerType
-} from 'reactflow';
-import 'reactflow/dist/style.css';
-import { markModuleComplete, isModuleComplete, XP_REWARDS } from '../utils/UserProgress';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { markModuleComplete, isModuleComplete } from '../utils/UserProgress';
 import XPNotification from './XPNotification';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-// Custom Node Styles
-const nodeStyle = {
-    background: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '16px',
-    color: 'white',
-    padding: '12px 20px',
-    minWidth: '180px',
-    textAlign: 'center',
-    backdropFilter: 'blur(12px)',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    transition: 'all 0.3s ease',
-};
-
-const rootNodeStyle = {
-    ...nodeStyle,
-    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.8), rgba(79, 70, 229, 0.8))',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    fontSize: '1.4rem',
-    fontWeight: '900',
-    minWidth: '240px',
-    padding: '24px',
-    boxShadow: '0 0 40px rgba(124, 58, 237, 0.3)',
-    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-};
-
-const weekNodeStyle = {
-    ...nodeStyle,
-    borderColor: 'var(--primary)',
-    borderWidth: '1px',
-    fontWeight: '700',
-    fontSize: '1.1rem',
-};
-
-const topicNodeStyle = {
-    ...nodeStyle,
-    fontSize: '0.95rem',
-    color: 'rgba(255, 255, 255, 0.8)',
-    border: '1px solid rgba(255, 255, 255, 0.05)',
-};
 
 export default function RoadmapView({ goal, experience = 'beginner', timeline = 4 }) {
     const [roadmap, setRoadmap] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [xpNotification, setXpNotification] = useState(null);
+    const [expandedWeek, setExpandedWeek] = useState(null);
 
-    const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchRoadmap = async () => {
@@ -82,7 +33,10 @@ export default function RoadmapView({ goal, experience = 'beginner', timeline = 
 
                 const data = await response.json();
                 setRoadmap(data);
-                generateGraph(data, goal);
+                // Expand the first week by default
+                if (data.weeks && data.weeks.length > 0) {
+                    setExpandedWeek(data.weeks[0].week);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -93,135 +47,38 @@ export default function RoadmapView({ goal, experience = 'beginner', timeline = 
         fetchRoadmap();
     }, [goal, experience, timeline]);
 
-    const generateGraph = (data, goalTitle) => {
-        const newNodes = [];
-        const newEdges = [];
-        let nodeId = 1;
-
-        // Root Node
-        const rootId = 'root';
-        newNodes.push({
-            id: rootId,
-            data: { label: goalTitle },
-            position: { x: 0, y: 0 },
-            style: rootNodeStyle,
-            type: 'input',
-        });
-
-        // Calculate layout
-        const weekSpacingX = 350;
-        const topicSpacingY = 120;
-        const startX = -((data.weeks.length - 1) * weekSpacingX) / 2;
-
-        data.weeks.forEach((week, i) => {
-            const weekId = `week-${week.week}`;
-            const isComplete = isModuleComplete(weekId, goalTitle);
-            const xPos = startX + (i * weekSpacingX);
-            const yPos = 250;
-
-            // Week Node
-            newNodes.push({
-                id: weekId,
-                data: {
-                    label: `Week ${week.week}: ${week.title}`,
-                    isComplete
-                },
-                position: { x: xPos, y: yPos },
-                style: {
-                    ...weekNodeStyle,
-                    borderColor: isComplete ? '#22c55e' : 'rgba(124, 58, 237, 0.5)',
-                    background: isComplete ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255, 255, 255, 0.03)',
-                    boxShadow: isComplete ? '0 0 20px rgba(34,197,94,0.2)' : 'none',
-                },
-            });
-
-            newEdges.push({
-                id: `e-root-${weekId}`,
-                source: rootId,
-                target: weekId,
-                animated: true,
-                style: { stroke: 'rgba(255,255,255,0.2)', strokeWidth: 2 },
-            });
-
-            // Topic Nodes
-            week.topics.forEach((topic, j) => {
-                const topicId = `${weekId}-topic-${j}`;
-                newNodes.push({
-                    id: topicId,
-                    data: { label: topic },
-                    position: { x: xPos, y: yPos + 120 + (j * topicSpacingY) },
-                    style: topicNodeStyle,
-                });
-
-                newEdges.push({
-                    id: `e-${weekId}-${topicId}`,
-                    source: weekId,
-                    target: topicId,
-                    type: 'smoothstep',
-                    style: { stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 },
-                });
-            });
-        });
-
-        setNodes(newNodes);
-        setEdges(newEdges);
+    const handleTopicClick = (topic) => {
+        if (confirm(`🎓 Want to generate a full course for "${topic}"?`)) {
+            router.push(`/course?topic=${encodeURIComponent(topic)}`);
+        }
     };
 
-    const router = useRouter();
+    const toggleWeek = (weekNum) => {
+        setExpandedWeek(expandedWeek === weekNum ? null : weekNum);
+    };
 
-    const onNodeClick = useCallback((event, node) => {
-        // Handle Topic Nodes - Generate Course
-        if (node.id.includes('topic')) {
-            const topic = node.data.label;
-            if (confirm(`🎓 Want to generate a full course for "${topic}"?`)) {
-                router.push(`/course?topic=${encodeURIComponent(topic)}`);
-            }
-            return;
-        }
-
-        if (node.id.startsWith('week-')) {
-            // Handle completion logic
-            const weekNum = node.id.split('-')[1];
-            const moduleId = node.id;
-
-            // Toggle completion (simplified for UI, real logic in utils)
-            // For now, let's just trigger the XP reward if not complete
-            if (!isModuleComplete(moduleId, goal)) {
-                const reward = markModuleComplete(moduleId, goal);
-                if (reward) {
-                    setXpNotification({ xp: reward.xpGained, reason: reward.reason });
-
-                    // Update node style locally to reflect completion immediately
-                    setNodes((nds) =>
-                        nds.map((n) => {
-                            if (n.id === node.id) {
-                                return {
-                                    ...n,
-                                    style: {
-                                        ...n.style,
-                                        borderColor: '#22c55e',
-                                        background: 'rgba(34, 197, 94, 0.1)',
-                                        boxShadow: '0 0 20px rgba(34,197,94,0.2)',
-                                    },
-                                    data: { ...n.data, isComplete: true },
-                                };
-                            }
-                            return n;
-                        })
-                    );
-                }
+    const handleMarkComplete = (weekId, e) => {
+        e.stopPropagation(); // Prevent toggling accordion
+        if (!isModuleComplete(weekId, goal)) {
+            const reward = markModuleComplete(weekId, goal);
+            if (reward) {
+                setXpNotification({ xp: reward.xpGained, reason: reward.reason });
+                // Force re-render to show checkmark (in a real app, use better state management)
+                setRoadmap({ ...roadmap });
             }
         }
-    }, [goal, setNodes, router]);
+    };
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 animate-fade-in min-h-[50vh]">
-                <div className="relative w-24 h-24 mb-8">
-                    <div className="absolute inset-0 border-4 border-[var(--primary)]/30 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex flex-col items-center justify-center p-12 min-h-[60vh]">
+                <div className="relative w-20 h-20 mb-10">
+                    <div className="absolute inset-0 border-2 border-white/5 rounded-full"></div>
+                    <div className="absolute inset-0 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute inset-4 border-2 border-white/10 border-b-transparent rounded-full animate-spin-slow"></div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Mapping Your Mind...</h3>
+                <h3 className="text-xl font-black text-white tracking-widest uppercase">Mapping Your Future</h3>
+                <p className="mt-2 text-gray-500 font-medium">Synthesizing personalized curriculum...</p>
             </div>
         );
     }
@@ -229,14 +86,14 @@ export default function RoadmapView({ goal, experience = 'beginner', timeline = 
     if (error) {
         return (
             <div className="text-center p-12 text-red-400">
-                <p>Failed to generate mindmap: {error}</p>
+                <p>Failed to generate roadmap: {error}</p>
                 <button onClick={() => window.location.reload()} className="mt-4 text-white underline">Try Again</button>
             </div>
         );
     }
 
     return (
-        <>
+        <div className="w-full max-w-4xl mx-auto pb-20">
             {xpNotification && (
                 <XPNotification
                     xp={xpNotification.xp}
@@ -245,55 +102,148 @@ export default function RoadmapView({ goal, experience = 'beginner', timeline = 
                 />
             )}
 
-            <div className="w-full h-[85vh] glass-panel rounded-3xl border border-white/10 overflow-hidden relative animate-fade-in shadow-2xl">
-                {/* Ambient Background */}
-                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03] pointer-events-none"></div>
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--primary)]/5 rounded-full blur-[100px] pointer-events-none"></div>
-
-                <div className="absolute top-6 left-6 z-10">
-                    <Link href="/dashboard" className="px-5 py-2.5 bg-black/40 backdrop-blur-md rounded-xl text-white text-sm font-medium hover:bg-black/60 transition-all border border-white/10 flex items-center gap-2 group">
-                        <span className="group-hover:-translate-x-1 transition-transform">←</span> Back
-                    </Link>
+            {/* Header info */}
+            <div className="mb-12 text-center">
+                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Active Roadmap</span>
                 </div>
-
-                <div className="absolute top-6 right-6 z-10 bg-black/40 p-5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg max-w-xs">
-                    <h2 className="text-xl font-bold text-white mb-1">{goal}</h2>
-                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                        Interactive Roadmap • Click weeks to complete • Click topics to generate courses
-                    </p>
+                <h1 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
+                    {goal}
+                </h1>
+                <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+                    <span className="px-3 py-1 bg-white/5 rounded-lg border border-white/5 uppercase tracking-wide text-xs font-bold">{experience}</span>
+                    <span className="px-3 py-1 bg-white/5 rounded-lg border border-white/5 uppercase tracking-wide text-xs font-bold">{timeline} Weeks</span>
                 </div>
-
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
-                    onNodeClick={onNodeClick}
-                    fitView
-                    attributionPosition="bottom-right"
-                    panOnScroll={true}
-                    selectionOnDrag={false}
-                    panOnDrag={true}
-                    minZoom={0.1}
-                    maxZoom={1.5}
-                >
-                    <Background color="#666" gap={20} size={1} style={{ opacity: 0.05 }} />
-                    <Controls style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
-                    <MiniMap
-                        nodeStrokeColor={(n) => {
-                            if (n.style?.borderColor) return n.style.borderColor;
-                            return 'rgba(255,255,255,0.2)';
-                        }}
-                        nodeColor={(n) => {
-                            if (n.style?.background && !n.style.background.includes('gradient')) return n.style.background;
-                            return 'rgba(255,255,255,0.1)';
-                        }}
-                        nodeBorderRadius={8}
-                        style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px' }}
-                        maskColor="rgba(0,0,0,0.4)"
-                    />
-                </ReactFlow>
             </div>
-        </>
+
+            {/* Vertical Timeline */}
+            <div className="relative pl-8 md:pl-0">
+                {/* Central Line (Desktop) */}
+                <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent -translate-x-1/2"></div>
+
+                {/* Left Line (Mobile) */}
+                <div className="md:hidden absolute left-4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+
+                <div className="flex flex-col gap-12">
+                    {roadmap?.weeks.map((week, index) => {
+                        const weekId = `week-${week.week}`;
+                        const isComplete = isModuleComplete(weekId, goal);
+                        const isExpanded = expandedWeek === week.week;
+                        const isEven = index % 2 === 0;
+
+                        return (
+                            <motion.div
+                                key={week.week}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className={`relative flex items-center md:justify-between ${!isEven ? 'md:flex-row-reverse' : ''}`}
+                            >
+                                {/* Timeline Dot */}
+                                <div className="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-white/20 rounded-full -translate-x-1/2 z-10 flex items-center justify-center">
+                                    {isComplete && <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>}
+                                </div>
+
+                                {/* Content Card */}
+                                <div className={`w-full md:w-[45%] ml-12 md:ml-0 group`}>
+                                    <div
+                                        onClick={() => toggleWeek(week.week)}
+                                        className={`
+                                            cursor-pointer overflow-hidden rounded-2xl border transition-all duration-300
+                                            ${isComplete
+                                                ? 'bg-emerald-900/10 border-emerald-500/30 hover:border-emerald-500/50'
+                                                : isExpanded
+                                                    ? 'bg-white/10 border-white/30 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
+                                                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                                            }
+                                        `}
+                                    >
+                                        {/* Card Header */}
+                                        <div className="p-6 flex items-start justify-between gap-4">
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <span className={`
+                                                        text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded
+                                                        ${isComplete ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/50'}
+                                                    `}>
+                                                        Week {week.week}
+                                                    </span>
+                                                    {isComplete && (
+                                                        <span className="text-emerald-500 text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                                                            Completed
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <h3 className={`text-xl font-bold ${isComplete ? 'text-white' : 'text-white/90'}`}>
+                                                    {week.title}
+                                                </h3>
+                                            </div>
+
+                                            {/* Action Button (Complete or Expand) */}
+                                            <div className="flex items-center gap-2">
+                                                {!isComplete && (
+                                                    <button
+                                                        onClick={(e) => handleMarkComplete(weekId, e)}
+                                                        className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all"
+                                                        title="Mark as Complete"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                                    </button>
+                                                )}
+                                                <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''} text-white/50`}>
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Expanded Content (Topics) */}
+                                        <AnimatePresence>
+                                            {isExpanded && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                                >
+                                                    <div className="px-6 pb-6 pt-0 border-t border-white/5 space-y-3">
+                                                        <p className="text-sm text-gray-400 mt-4 mb-4 italic">Select a topic to start learning:</p>
+                                                        {week.topics.map((topic, i) => (
+                                                            <div
+                                                                key={i}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleTopicClick(topic);
+                                                                }}
+                                                                className="group/topic flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5 hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer"
+                                                            >
+                                                                <span className="text-sm font-medium text-gray-300 group-hover/topic:text-white transition-colors">
+                                                                    {topic}
+                                                                </span>
+                                                                <span className="opacity-0 group-hover/topic:opacity-100 transition-opacity text-xs font-bold text-white bg-blue-600 px-3 py-1 rounded-full shadow-lg shadow-blue-600/20">
+                                                                    Start →
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <div className="mt-20 flex justify-center">
+                <Link href="/dashboard" className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 font-bold tracking-wide transition-all">
+                    Return to Dashboard
+                </Link>
+            </div>
+        </div>
     );
 }
+
