@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ProjectMentorChat from '@/components/ProjectMentorChat';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function SideProjectView() {
     const [skills, setSkills] = useState('');
@@ -218,9 +219,11 @@ export default function SideProjectView() {
                             )}
 
                             {loadingBlueprint ? (
-                                <div className="flex flex-col items-center justify-center py-20 gap-4 mt-20">
-                                    <span className="w-8 h-8 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></span>
-                                    <p className="text-white animate-pulse">Initializing Mission Protocol...</p>
+                                <div className="py-20">
+                                    <LoadingSpinner
+                                        title="Initializing Mission Protocol"
+                                        message="Constructing your project blueprint..."
+                                    />
                                 </div>
                             ) : blueprint ? (
                                 <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500 pb-20">

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { awardXP, XP_REWARDS } from '../utils/UserProgress';
 import XPNotification from './XPNotification';
+import LoadingSpinner from './ui/LoadingSpinner';
 
 export default function Quiz({ goal, onComplete }) {
     const [questions, setQuestions] = useState([]);
@@ -94,17 +95,10 @@ export default function Quiz({ goal, onComplete }) {
 
     if (loading) {
         return (
-            <div className="relative w-full max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-500">
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-2xl opacity-50"></div>
-                <div className="relative bg-[#0a0a0a]/90 border border-white/10 p-12 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    </div>
-                    <h3 className="text-xl font-black text-white mb-2 uppercase tracking-wide">Generating Assessment</h3>
-                    <p className="text-gray-500 font-medium">Crafting questions for {goal}...</p>
-                </div>
-            </div>
+            <LoadingSpinner
+                title="Generating Assessment"
+                message={`Crafting questions for ${goal}...`}
+            />
         );
     }
 

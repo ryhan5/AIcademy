@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { markModuleComplete, isModuleComplete } from '../utils/UserProgress';
 import XPNotification from './XPNotification';
+import LoadingSpinner from './ui/LoadingSpinner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -71,15 +72,10 @@ export default function RoadmapView({ goal, experience = 'beginner', timeline = 
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 min-h-[60vh]">
-                <div className="relative w-20 h-20 mb-10">
-                    <div className="absolute inset-0 border-2 border-white/5 rounded-full"></div>
-                    <div className="absolute inset-0 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <div className="absolute inset-4 border-2 border-white/10 border-b-transparent rounded-full animate-spin-slow"></div>
-                </div>
-                <h3 className="text-xl font-black text-white tracking-widest uppercase">Mapping Your Future</h3>
-                <p className="mt-2 text-gray-500 font-medium">Synthesizing personalized curriculum...</p>
-            </div>
+            <LoadingSpinner
+                title="Mapping Your Future"
+                message="Synthesizing personalized curriculum..."
+            />
         );
     }
 

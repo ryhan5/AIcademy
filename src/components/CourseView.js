@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { markModuleComplete, isModuleComplete, awardXP, XP_REWARDS } from '../utils/UserProgress';
 import XPNotification from './XPNotification';
 import MentorChat from './MentorChat';
+import LoadingSpinner from './ui/LoadingSpinner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -158,17 +159,10 @@ export default function CourseView({ topic, duration, initialData, onCourseGener
 
     if (loading) {
         return (
-            <div className="relative w-full h-full flex items-center justify-center animate-in fade-in zoom-in-95 duration-500">
-                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-fuchsia-500/20 blur-3xl opacity-50"></div>
-                <div className="relative p-12 flex flex-col items-center justify-center text-center">
-                    <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 relative overflow-hidden shadow-2xl">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-shimmer"></div>
-                        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    </div>
-                    <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-wide">Generating Course</h3>
-                    <p className="text-gray-500 font-medium">Curating the best content for {topic}...</p>
-                </div>
-            </div>
+            <LoadingSpinner
+                title="Generating Course"
+                message={`Curating the best content for ${topic}...`}
+            />
         );
     }
 
