@@ -13,10 +13,18 @@ export async function POST(req) {
         await dbConnect();
         const { topic } = await req.json();
 
+        if (!topic) {
+            return NextResponse.json({ error: "Topic is required" }, { status: 400 });
+        }
+
         const user = await User.findOne({ email: session.user.email });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
         // 1. Add to completed courses if strictly new
+        if (!user.completedCourses) {
+            user.completedCourses = [];
+        }
+
         const alreadyCompleted = user.completedCourses.includes(topic);
         if (!alreadyCompleted) {
             user.completedCourses.push(topic);

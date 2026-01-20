@@ -43,6 +43,10 @@ const UserSchema = new mongoose.Schema({
         type: [String], // Array of module IDs
         default: [],
     },
+    completedCourses: {
+        type: [String], // Array of course topics
+        default: [],
+    },
     completedRoadmaps: {
         type: [String], // Array of roadmap IDs
         default: [],
